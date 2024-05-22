@@ -1,0 +1,127 @@
+\doxysection{RCReceiver Class Reference}
+\hypertarget{class_r_c_receiver}{}\label{class_r_c_receiver}\index{RCReceiver@{RCReceiver}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_r_c_receiver_ab80f33da769f0122538f87b882dff735}{RCReceiver}} (TIM\+\_\+\+Handle\+Type\+Def \texorpdfstring{$\ast$}{*}timer, uint32\+\_\+t channel)
+\begin{DoxyCompactList}\small\item\em Constructor for the \doxylink{class_r_c_receiver}{RCReceiver} class. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_r_c_receiver_a6bc8e462bbf308a2c4f6fe71d18260b8}{trigger\+\_\+signal}} ()
+\begin{DoxyCompactList}\small\item\em Triggers the signal capture for the RC receiver. \end{DoxyCompactList}\item 
+int16\+\_\+t \mbox{\hyperlink{class_r_c_receiver_a72e354d26dbdcff5110016683f8f8600}{get\+\_\+signal}} ()
+\begin{DoxyCompactList}\small\item\em Gets the captured signal value. \end{DoxyCompactList}\item 
+uint8\+\_\+t \mbox{\hyperlink{class_r_c_receiver_a19efebc4c12bbd020f281419b567f9a9}{check\+\_\+flag}} ()
+\begin{DoxyCompactList}\small\item\em Checks the flag status. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_r_c_receiver_adc9a6cf4ac808be86a426e2d8b3c86be}{set\+\_\+flag}} (uint8\+\_\+t n)
+\begin{DoxyCompactList}\small\item\em Sets the flag status. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_r_c_receiver_a362673e8a0c3f52992cec27ebec4f30f}\label{class_r_c_receiver_a362673e8a0c3f52992cec27ebec4f30f} 
+TIM\+\_\+\+Handle\+Type\+Def \texorpdfstring{$\ast$}{*} {\bfseries timer}
+\item 
+\Hypertarget{class_r_c_receiver_acf1acdee99a788ba96c2f8f657db57fb}\label{class_r_c_receiver_acf1acdee99a788ba96c2f8f657db57fb} 
+uint32\+\_\+t {\bfseries channel}
+\item 
+\Hypertarget{class_r_c_receiver_a17f3f455a66b9bc66a2879e531f910cd}\label{class_r_c_receiver_a17f3f455a66b9bc66a2879e531f910cd} 
+uint16\+\_\+t {\bfseries count1}
+\item 
+\Hypertarget{class_r_c_receiver_a9f58418b1020bbfb989d7298c1ac4424}\label{class_r_c_receiver_a9f58418b1020bbfb989d7298c1ac4424} 
+uint16\+\_\+t {\bfseries count2}
+\item 
+\Hypertarget{class_r_c_receiver_a9d8ba55a6f450289a1cea1d3e34d1642}\label{class_r_c_receiver_a9d8ba55a6f450289a1cea1d3e34d1642} 
+uint16\+\_\+t {\bfseries diff}
+\item 
+\Hypertarget{class_r_c_receiver_adfcfb6e53cbd0ff828a2337e33bbd536}\label{class_r_c_receiver_adfcfb6e53cbd0ff828a2337e33bbd536} 
+uint8\+\_\+t {\bfseries First\+\_\+\+Capture}
+\item 
+\Hypertarget{class_r_c_receiver_afa1fe592b31fb8154ea5a5bddf7808f2}\label{class_r_c_receiver_afa1fe592b31fb8154ea5a5bddf7808f2} 
+int16\+\_\+t {\bfseries signal}
+\item 
+\Hypertarget{class_r_c_receiver_a709f73d0b1a502015c5e1cb6d1dfb4bf}\label{class_r_c_receiver_a709f73d0b1a502015c5e1cb6d1dfb4bf} 
+uint8\+\_\+t {\bfseries flag}
+\item 
+\Hypertarget{class_r_c_receiver_a61a5e8dc2edd385f3a212236c5937834}\label{class_r_c_receiver_a61a5e8dc2edd385f3a212236c5937834} 
+uint8\+\_\+t {\bfseries test}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_r_c_receiver_ab80f33da769f0122538f87b882dff735}\label{class_r_c_receiver_ab80f33da769f0122538f87b882dff735} 
+\index{RCReceiver@{RCReceiver}!RCReceiver@{RCReceiver}}
+\index{RCReceiver@{RCReceiver}!RCReceiver@{RCReceiver}}
+\doxysubsubsection{\texorpdfstring{RCReceiver()}{RCReceiver()}}
+{\footnotesize\ttfamily RCReceiver\+::\+RCReceiver (\begin{DoxyParamCaption}\item[{TIM\+\_\+\+Handle\+Type\+Def \texorpdfstring{$\ast$}{*}}]{timer,  }\item[{uint32\+\_\+t}]{channel }\end{DoxyParamCaption})}
+
+
+
+Constructor for the \doxylink{class_r_c_receiver}{RCReceiver} class. 
+
+Initializes the \doxylink{class_r_c_receiver}{RCReceiver} object and starts the input capture interrupt for the given timer and channel.
+
+
+\begin{DoxyParams}{Parameters}
+{\em timer} & Pointer to the timer used. \\
+\hline
+{\em channel} & Timer channel used for capturing the RC signal. \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_r_c_receiver_a19efebc4c12bbd020f281419b567f9a9}\label{class_r_c_receiver_a19efebc4c12bbd020f281419b567f9a9} 
+\index{RCReceiver@{RCReceiver}!check\_flag@{check\_flag}}
+\index{check\_flag@{check\_flag}!RCReceiver@{RCReceiver}}
+\doxysubsubsection{\texorpdfstring{check\_flag()}{check\_flag()}}
+{\footnotesize\ttfamily uint8\+\_\+t RCReceiver\+::check\+\_\+flag (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Checks the flag status. 
+
+\begin{DoxyReturn}{Returns}
+The flag status as an integer (true/false). 
+\end{DoxyReturn}
+\Hypertarget{class_r_c_receiver_a72e354d26dbdcff5110016683f8f8600}\label{class_r_c_receiver_a72e354d26dbdcff5110016683f8f8600} 
+\index{RCReceiver@{RCReceiver}!get\_signal@{get\_signal}}
+\index{get\_signal@{get\_signal}!RCReceiver@{RCReceiver}}
+\doxysubsubsection{\texorpdfstring{get\_signal()}{get\_signal()}}
+{\footnotesize\ttfamily int16\+\_\+t RCReceiver\+::get\+\_\+signal (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Gets the captured signal value. 
+
+\begin{DoxyReturn}{Returns}
+The captured signal value. 
+\end{DoxyReturn}
+\Hypertarget{class_r_c_receiver_adc9a6cf4ac808be86a426e2d8b3c86be}\label{class_r_c_receiver_adc9a6cf4ac808be86a426e2d8b3c86be} 
+\index{RCReceiver@{RCReceiver}!set\_flag@{set\_flag}}
+\index{set\_flag@{set\_flag}!RCReceiver@{RCReceiver}}
+\doxysubsubsection{\texorpdfstring{set\_flag()}{set\_flag()}}
+{\footnotesize\ttfamily void RCReceiver\+::set\+\_\+flag (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{n }\end{DoxyParamCaption})}
+
+
+
+Sets the flag status. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em n} & An integer n to set the flag true/false. \\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_r_c_receiver_a6bc8e462bbf308a2c4f6fe71d18260b8}\label{class_r_c_receiver_a6bc8e462bbf308a2c4f6fe71d18260b8} 
+\index{RCReceiver@{RCReceiver}!trigger\_signal@{trigger\_signal}}
+\index{trigger\_signal@{trigger\_signal}!RCReceiver@{RCReceiver}}
+\doxysubsubsection{\texorpdfstring{trigger\_signal()}{trigger\_signal()}}
+{\footnotesize\ttfamily void RCReceiver\+::trigger\+\_\+signal (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Triggers the signal capture for the RC receiver. 
+
+This function is called to handle a direct input capture. It captures the RC signal pulse width and updates the signal value. It also checks to make sure the signal doesn\textquotesingle{}t go out of sync, or to not use a bad signal. 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+RCReceiver.\+h\item 
+\mbox{\hyperlink{_r_c_receiver_8cpp}{RCReceiver.\+cpp}}\end{DoxyCompactItemize}

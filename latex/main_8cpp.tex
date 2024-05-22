@@ -1,0 +1,137 @@
+\doxysection{main.\+cpp File Reference}
+\hypertarget{main_8cpp}{}\label{main_8cpp}\index{main.cpp@{main.cpp}}
+
+
+\+: Main program body  
+
+
+{\ttfamily \#include "{}main.\+h"{}}\newline
+{\ttfamily \#include "{}string.\+h"{}}\newline
+{\ttfamily \#include "{}RCReceiver.\+h"{}}\newline
+{\ttfamily \#include "{}Motor\+Driver.\+h"{}}\newline
+{\ttfamily \#include "{}stm32f4xx\+\_\+hal.\+h"{}}\newline
+{\ttfamily \#include $<$cstdio$>$}\newline
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{main_8cpp_a70af21c671abfcc773614a9a4f63d920}{System\+Clock\+\_\+\+Config}} (void)
+\begin{DoxyCompactList}\small\item\em System Clock Configuration. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{main_8cpp_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\begin{DoxyCompactList}\small\item\em The application entry point. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{main_8cpp_a77a2401a35ddd9bd0b8fc28331b81381}{HAL\+\_\+\+TIM\+\_\+\+IC\+\_\+\+Capture\+Callback}} (TIM\+\_\+\+Handle\+Type\+Def \texorpdfstring{$\ast$}{*}htim)
+\begin{DoxyCompactList}\small\item\em Callback for direct input capture events. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{main_8cpp_a1730ffe1e560465665eb47d9264826f9}{Error\+\_\+\+Handler}} (void)
+\begin{DoxyCompactList}\small\item\em This function is executed in case of error occurrence. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{main_8cpp_a611ea7185a9cc6d6e969cc28ee4ee2f5}\label{main_8cpp_a611ea7185a9cc6d6e969cc28ee4ee2f5} 
+TIM\+\_\+\+Handle\+Type\+Def {\bfseries htim3}
+\item 
+\Hypertarget{main_8cpp_a7595763ddfb842ac51126a7b645b5f71}\label{main_8cpp_a7595763ddfb842ac51126a7b645b5f71} 
+TIM\+\_\+\+Handle\+Type\+Def {\bfseries htim4}
+\item 
+\Hypertarget{main_8cpp_a2cf715bef37f7e8ef385a30974a5f0d5}\label{main_8cpp_a2cf715bef37f7e8ef385a30974a5f0d5} 
+UART\+\_\+\+Handle\+Type\+Def {\bfseries huart1}
+\item 
+\Hypertarget{main_8cpp_aa9479c261d65eecedd3d9582f7f0f89c}\label{main_8cpp_aa9479c261d65eecedd3d9582f7f0f89c} 
+UART\+\_\+\+Handle\+Type\+Def {\bfseries huart2}
+\item 
+\Hypertarget{main_8cpp_a4f42453467ea02e900d1d7519ad7c407}\label{main_8cpp_a4f42453467ea02e900d1d7519ad7c407} 
+char {\bfseries databuffer} \mbox{[}100\mbox{]}
+\item 
+\Hypertarget{main_8cpp_a184b5dd9844bf6e022deb71044ff7f64}\label{main_8cpp_a184b5dd9844bf6e022deb71044ff7f64} 
+char {\bfseries msg} \mbox{[}100\mbox{]}
+\item 
+\Hypertarget{main_8cpp_ab4be6b672a30da9d75c7a8f55fd373fa}\label{main_8cpp_ab4be6b672a30da9d75c7a8f55fd373fa} 
+int16\+\_\+t {\bfseries signal1}
+\item 
+\Hypertarget{main_8cpp_a1818af0826aa8d3d5baae2661419adb5}\label{main_8cpp_a1818af0826aa8d3d5baae2661419adb5} 
+int16\+\_\+t {\bfseries signal2}
+\item 
+\Hypertarget{main_8cpp_aba89da2b9b99d757d71a4692e9a909d5}\label{main_8cpp_aba89da2b9b99d757d71a4692e9a909d5} 
+int16\+\_\+t {\bfseries duty1}
+\item 
+\Hypertarget{main_8cpp_ad2da56f21803f912425e2f8dab2b02df}\label{main_8cpp_ad2da56f21803f912425e2f8dab2b02df} 
+int16\+\_\+t {\bfseries duty2}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\+: Main program body 
+
+\begin{DoxyAttention}{Attention}
+
+\end{DoxyAttention}
+Copyright (c) 2024 STMicroelectronics. All rights reserved.
+
+This software is licensed under terms that can be found in the LICENSE file in the root directory of this software component. If no LICENSE file comes with this software, it is provided AS-\/\+IS. 
+
+\doxysubsection{Function Documentation}
+\Hypertarget{main_8cpp_a1730ffe1e560465665eb47d9264826f9}\label{main_8cpp_a1730ffe1e560465665eb47d9264826f9} 
+\index{main.cpp@{main.cpp}!Error\_Handler@{Error\_Handler}}
+\index{Error\_Handler@{Error\_Handler}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{Error\_Handler()}{Error\_Handler()}}
+{\footnotesize\ttfamily void Error\+\_\+\+Handler (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+This function is executed in case of error occurrence. 
+
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+\Hypertarget{main_8cpp_a77a2401a35ddd9bd0b8fc28331b81381}\label{main_8cpp_a77a2401a35ddd9bd0b8fc28331b81381} 
+\index{main.cpp@{main.cpp}!HAL\_TIM\_IC\_CaptureCallback@{HAL\_TIM\_IC\_CaptureCallback}}
+\index{HAL\_TIM\_IC\_CaptureCallback@{HAL\_TIM\_IC\_CaptureCallback}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{HAL\_TIM\_IC\_CaptureCallback()}{HAL\_TIM\_IC\_CaptureCallback()}}
+{\footnotesize\ttfamily void HAL\+\_\+\+TIM\+\_\+\+IC\+\_\+\+Capture\+Callback (\begin{DoxyParamCaption}\item[{TIM\+\_\+\+Handle\+Type\+Def \texorpdfstring{$\ast$}{*}}]{htim }\end{DoxyParamCaption})}
+
+
+
+Callback for direct input capture events. 
+
+This function is called when there is a direct input capture event on the given timer. It checks the active channel and triggers the appropriate RC signal given signal flag conditions.
+
+
+\begin{DoxyParams}{Parameters}
+{\em htim} & Pointer to the timer handle that generated the input capture event. \\
+\hline
+\end{DoxyParams}
+\Hypertarget{main_8cpp_a840291bc02cba5474a4cb46a9b9566fe}\label{main_8cpp_a840291bc02cba5474a4cb46a9b9566fe} 
+\index{main.cpp@{main.cpp}!main@{main}}
+\index{main@{main}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+The application entry point. 
+
+
+\begin{DoxyRetVals}{Return values}
+{\em int} & \\
+\hline
+\end{DoxyRetVals}
+\Hypertarget{main_8cpp_a70af21c671abfcc773614a9a4f63d920}\label{main_8cpp_a70af21c671abfcc773614a9a4f63d920} 
+\index{main.cpp@{main.cpp}!SystemClock\_Config@{SystemClock\_Config}}
+\index{SystemClock\_Config@{SystemClock\_Config}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{SystemClock\_Config()}{SystemClock\_Config()}}
+{\footnotesize\ttfamily void System\+Clock\+\_\+\+Config (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+System Clock Configuration. 
+
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+Configure the main internal regulator output voltage
+
+Initializes the RCC Oscillators according to the specified parameters in the RCC\+\_\+\+Osc\+Init\+Type\+Def structure.
+
+Initializes the CPU, AHB and APB buses clocks
