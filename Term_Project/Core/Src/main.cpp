@@ -65,12 +65,15 @@ uint8_t FR = 0;
 uint16_t curr_tick;
 uint16_t left_tick;
 uint16_t right_tick;
+uint8_t L_flag = 0;
+uint8_t R_flag = 0;
 //uint16_t adc_value[2];
 //uint8_t adcIdx;
 uint16_t adc_value_9;
 uint16_t adc_value_2;
 uint8_t state = 0;
 uint16_t Fire_Rate;
+uint16_t dart_counter = 0;
 static void ADC_Select_CH9 (void)
 {
 	ADC_ChannelConfTypeDef sConfig = {0};
@@ -236,6 +239,7 @@ int main(void)
 
 
 	  curr_tick = HAL_GetTick();
+
 	  ADC_Select_CH2();
 	  HAL_ADC_Start(&hadc1);
 	  HAL_ADC_PollForConversion(&hadc1,50);
@@ -252,9 +256,9 @@ int main(void)
 
 	  Fire_Rate = (4096-adc_value_9)*100/4096;
 
-	  snprintf(msg, sizeof(msg), "ADC1: %i ADC2: %i \n\r", adc_value_9,adc_value_2);
-	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, 100,500);
-	  memset(msg,0, sizeof msg);
+//	  snprintf(msg, sizeof(msg), "ADC1: %i ADC2: %i \n\r",adc_value_2, adc_value_9);
+//	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, 100,500);
+//	  memset(msg,0, sizeof msg);
 
 	  // ESC Startup Procedure
 	  if (!startup) {
@@ -280,7 +284,7 @@ int main(void)
 
 
 	  // Fire Trigger Logic
-	  if (!HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_3)){
+	  if (!HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_3) && HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_9)){
 
 		  // Safety Switch
 //		  if (HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_9)){
@@ -314,39 +318,81 @@ int main(void)
 //				  }
 //			  }
 
-		  // Left Solenoid
-		  if ((curr_tick - left_tick) > Fire_Rate){
 
-		  if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5)){
-			  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
+
+//			  // LEFT_SINGLE
+//			  if ((curr_tick - left_tick) > Fire_Rate){
+//				  if (!L_flag && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5)){
+//					  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
+//					  L_flag = 1;
+//				  }
+//				  else if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8)){
+//					  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
+//				  }
+//
+//			  }
+
+
+//			  // RIGHT_SINGLE
+//			  if ((curr_tick - right_tick) > Fire_Rate){
+//				  if (!R_flag && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7)){
+//					  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_SET);
+//					  R_flag = 1;
+//				  }
+//				  else if(!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9)){
+//					  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
+//				  }
+//			  }
+
+
+
+//		  	  	  // ALT_AUTO
+//		  		  // Use L_flag as a first state
+//
+//		  		  if (!L_flag && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5)){
+//		  			  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
+//		  			  L_flag = 1;
+//		  			  left_tick = curr_tick;
+//		  		  }
+//		  		  else if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7) && (curr_tick-left_tick > Fire_Rate)) {
+//		  			  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_SET);
+//		  			  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
+//		  			  right_tick = curr_tick;
+//
+//		  		  }
+//
+//		  		  else if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9) && (curr_tick - right_tick > Fire_Rate)){
+//		  			  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
+//		  			  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
+//		  			  left_tick = curr_tick;
+//		  		  }
+
+
+		  	  // AUTO_BOTH
+		  	  if ((curr_tick-left_tick) > Fire_Rate){
+		  		  if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5)){
+		  			  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_SET);
+		  			  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
+		  			  left_tick = curr_tick;
+
+		  		  }
+		  		  else if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8)){
+		  			  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
+		  			  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
+
+		  		  }
+		  	  }
+
 		  }
-		  if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8)){
-			 HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
-		  }
-
-		  }
-
-		  // Right Solenoid
-
-		  if ((curr_tick - right_tick) > Fire_Rate){
-
-		  if(!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7)){
-			  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_SET);
-		  }
-
-		  if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9)){
-			  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
-		  }
-
-		  left_tick = curr_tick;
-		  right_tick = curr_tick;
-		  }
-	  }
 
 	  else{
 		  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
 		  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
+		  R_flag = 0;
+		  L_flag = 0;
 	  }
+
+
 
 	  }
 
