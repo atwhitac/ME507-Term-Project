@@ -67,13 +67,15 @@ uint16_t left_tick;
 uint16_t right_tick;
 uint8_t L_flag = 0;
 uint8_t R_flag = 0;
-//uint16_t adc_value[2];
-//uint8_t adcIdx;
 uint16_t adc_value_9;
 uint16_t adc_value_2;
 uint8_t state = 0;
 uint16_t Fire_Rate;
 uint16_t dart_counter = 0;
+uint16_t idx = 1;
+uint8_t last_fired = 0;
+uint8_t alt_state = 0;
+
 static void ADC_Select_CH9 (void)
 {
 	ADC_ChannelConfTypeDef sConfig = {0};
@@ -105,22 +107,22 @@ static void ADC_Select_CH2 (void)
 char msg[100];
 char msg2[100];
 
-enum MODE {
-	// Syntax follows: MODE_MAGSELECTION
-	SAFETY,
-	SINGLE_LEFT,
-	SINGLE_RIGHT,
-	SINGLE_ALT,
-	SINGLE_BOTH,
-	BURST_LEFT,
-	BURST_RIGHT,
-	BURST_ALT,
-	BURST_BOTH,
-	AUTO_LEFT,
-	AUTO_RIGHT,
-	AUTO_ALT,
-	AUTO_BOTH,
-};
+//enum MODE {
+//	// Syntax follows: MODE_MAGSELECTION
+//	SAFETY,
+//	SINGLE_LEFT,
+//	SINGLE_RIGHT,
+//	SINGLE_ALT,
+//	SINGLE_BOTH,
+//	BURST_LEFT,
+//	BURST_RIGHT,
+//	BURST_ALT,
+//	BURST_BOTH,
+//	AUTO_LEFT,
+//	AUTO_RIGHT,
+//	AUTO_ALT,
+//	AUTO_BOTH,
+//};
 
 // Beam Brake Flags
 
@@ -256,9 +258,10 @@ int main(void)
 
 	  Fire_Rate = (4096-adc_value_9)*100/4096;
 
-//	  snprintf(msg, sizeof(msg), "ADC1: %i ADC2: %i \n\r",adc_value_2, adc_value_9);
-//	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, 100,500);
-//	  memset(msg,0, sizeof msg);
+	  snprintf(msg, sizeof(msg), "BL: %i FL: %i BR: %i FR: %i \n\r",!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5), !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8),
+			  	  	  	  	  	  	  	  	  	  	  	  	  	  	!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7),!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9));
+	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, 100,500);
+	  memset(msg,0, sizeof msg);
 
 	  // ESC Startup Procedure
 	  if (!startup) {
@@ -294,94 +297,153 @@ int main(void)
 //			  state = 1;
 //		  }
 
-			  //first trigger
-//			  if (state == 0){
-//			  	HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
-//				HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
-//			  }
 
-//			  if (state == 1){
-//				  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
-//				  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
-//				  if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9)){
-//				  	state = 2;
+
+//		  	 // LEFT Solenoid
+//
+//		  	  if ( ((curr_tick - left_tick) > Fire_Rate)){
+//		  		  if ((dart_counter < idx) &&!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5)){
+//		  			  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
+//		  			  left_tick = curr_tick;
+//		  			  dart_counter += 1;
+//		  		  }
+//		  		  else if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8)){
+//		  		      HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
+//
+//		  		  }
+//
+//		  	  }
+
+
+//		     // RIGHT Solenoid
+//			  if ( ((curr_tick - right_tick) > Fire_Rate)){
+//				  if ((dart_counter < idx) &&!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7)){
+//					  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_SET);
+//					  right_tick = curr_tick;
+//					  dart_counter += 1;
+//				  }
+//				  else if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9)){
+//					  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
+//
 //				  }
 //
 //			  }
+
+
+
+
+		  // ALTERNATE FSM
+		  if (alt_state == 0){
+			  if (last_fired == 0) {
+				  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
+				  left_tick = curr_tick;
+				  alt_state = 1;
+				  dart_counter++;
+				  last_fired = 1;
+			  }
+			  else{
+				  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_SET);
+				  right_tick = curr_tick;
+				  alt_state = 2;
+				  dart_counter++;
+				  last_fired = 0;
+			  }
+
+
+		  }
+
+		  else if (alt_state == 1){
+			  if (dart_counter == idx){
+				  alt_state = 3;
+			  }
+			  else if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7) && (curr_tick-left_tick > Fire_Rate)){
+				  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_SET);
+				  dart_counter ++;
+				  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
+				  right_tick = curr_tick;
+				  last_fired = 1;
+				  alt_state = 2;
+			  }
+
+		  }
+
+		  else if (alt_state == 2){
+			  if (dart_counter == idx){
+				  alt_state = 3;
+			  }
+			  else if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9) && (curr_tick - right_tick > Fire_Rate)){
+				  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
+				  dart_counter ++;
+				  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
+				  left_tick = curr_tick;
+				  last_fired = 0;
+				  alt_state = 1;
+			  }
+
+
+		  }
+
+		  else if (alt_state == 3){
+			  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
+			  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
+
+		  }
+
+		  else{
+			  alt_state = 0;
+		  }
+
+//		  if (dart_counter < idx){
 //
-//			  else if (state == 2){
-//				  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
-//				  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_SET);
-//
-//				  if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7)){
-//				  state = 1;
-//				  }
-//			  }
-
-
-
-//			  // LEFT_SINGLE
-//			  if ((curr_tick - left_tick) > Fire_Rate){
 //				  if (!L_flag && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5)){
 //					  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
 //					  L_flag = 1;
-//				  }
-//				  else if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8)){
-//					  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
+//					  left_tick = curr_tick;
 //				  }
 //
-//			  }
-
-
-//			  // RIGHT_SINGLE
-//			  if ((curr_tick - right_tick) > Fire_Rate){
-//				  if (!R_flag && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7)){
-//					  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_SET);
-//					  R_flag = 1;
-//				  }
-//				  else if(!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9)){
-//					  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
-//				  }
-//			  }
-
-
-
-//		  	  	  // ALT_AUTO
-//		  		  // Use L_flag as a first state
-//
-//		  		  if (!L_flag && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5)){
-//		  			  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
-//		  			  L_flag = 1;
-//		  			  left_tick = curr_tick;
-//		  		  }
-//		  		  else if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7) && (curr_tick-left_tick > Fire_Rate)) {
+//				  else if ((!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7) && (curr_tick-left_tick > Fire_Rate))) {
 //		  			  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_SET);
+//		  			  dart_counter ++;
 //		  			  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
 //		  			  right_tick = curr_tick;
+//		  			  L_flag = 1;
+//
 //
 //		  		  }
 //
-//		  		  else if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9) && (curr_tick - right_tick > Fire_Rate)){
+//		  		  else if ( !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9) && (curr_tick - right_tick > Fire_Rate)){
 //		  			  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
+//		  			  dart_counter ++;
 //		  			  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
 //		  			  left_tick = curr_tick;
+//
+//		  		  }
+//
+//		  	  }
+//		  	  else{
+//		  		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
+//		  		HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
+//		  	  }
+//		  		  else if(dart_counter > idx){
+//		  			HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
+//		  			HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
 //		  		  }
 
 
-		  	  // AUTO_BOTH
-		  	  if ((curr_tick-left_tick) > Fire_Rate){
-		  		  if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5)){
-		  			  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_SET);
-		  			  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
-		  			  left_tick = curr_tick;
-
-		  		  }
-		  		  else if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8)){
-		  			  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
-		  			  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
-
-		  		  }
-		  	  }
+//		  	  // AUTO_BOTH
+//		  	  if ((curr_tick-left_tick) > Fire_Rate){
+//		  		  if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5)){
+//		  			  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_SET);
+//		  			  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
+//		  			  left_tick = curr_tick;
+//
+//		  		  }
+//		  		  else if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8)){
+//		  			  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
+//		  			  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
+//
+//		  		  }
+//		  	  }
 
 		  }
 
@@ -390,6 +452,8 @@ int main(void)
 		  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
 		  R_flag = 0;
 		  L_flag = 0;
+		  dart_counter = 0;
+		  alt_state = 0;
 	  }
 
 
