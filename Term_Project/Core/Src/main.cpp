@@ -48,10 +48,22 @@ ADC_HandleTypeDef hadc1;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim4;
+DMA_HandleTypeDef hdma_tim3_ch1_trig;
 
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
+
+#define MAX_LED 12
+#define USE_BRIGHTNESS 0
+
+uint8_t LED_Data[MAX_LED][4];
+uint8_t LED_Mod[MAX_LED][4];
+
+uint16_t pwmData[(24*MAX_LED)+50];
+
+volatile int datasentflag = 1;
+
 int16_t duty = 0;
 uint8_t flag = 0;
 uint16_t counts = 1600;
@@ -75,6 +87,21 @@ uint16_t dart_counter = 0;
 uint16_t idx = 1;
 uint8_t last_fired = 0;
 uint8_t alt_state = 0;
+uint8_t type = 0;
+uint8_t type_tick = 0;
+uint8_t mode_state = 0;
+uint8_t mode_flag = 0;
+uint16_t mode_tick = 0;
+uint16_t type_list[] = {1,4,500};
+uint8_t type_flag = 0;
+uint8_t trigger_tick = 0;
+uint8_t trigger_flag = 0;
+uint16_t shoot_flag = 0;
+uint16_t shoot_state = 4; // Start in Safety
+uint16_t shoot_tick = 0;
+uint8_t both_state = 0;
+uint8_t left_state = 0;
+uint8_t right_state = 0;
 
 static void ADC_Select_CH9 (void)
 {
@@ -127,15 +154,13 @@ char msg2[100];
 // Beam Brake Flags
 
 
-MotorDriver motor1(&htim2, TIM_CHANNEL_1);
-MotorDriver motor2(&htim2, TIM_CHANNEL_2);
-
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_TIM4_Init(void);
@@ -179,6 +204,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
   MX_TIM4_Init();
@@ -191,16 +217,11 @@ int main(void)
 
   HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_2);
-  HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
+//  HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_1);
   HAL_ADC_Start(&hadc1);
   HAL_ADC_Init(&hadc1);
 
-  motor1.enable();
-  motor2.enable();
-
-  motor1.set_duty(0);
-  motor2.set_duty(0);
 
 
   // Solenoid 1 Pins
@@ -224,8 +245,7 @@ int main(void)
   HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7,GPIO_PIN_RESET);
   HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13,GPIO_PIN_RESET);
 
-
-//  MODE MODE = SAFETY;
+  LED_Safety(mode_state,type);
 
 
   /* USER CODE END 2 */
@@ -242,26 +262,11 @@ int main(void)
 
 	  curr_tick = HAL_GetTick();
 
-	  ADC_Select_CH2();
-	  HAL_ADC_Start(&hadc1);
-	  HAL_ADC_PollForConversion(&hadc1,50);
-	  adc_value_2 = HAL_ADC_GetValue(&hadc1); // Right POT
-	  HAL_ADC_Stop(&hadc1);
 
-	  counts = adc_value_2*(2000-1500)/(4096 - 0) + 1500;
 
-	  ADC_Select_CH9();
-	  HAL_ADC_Start(&hadc1);
-	  HAL_ADC_PollForConversion(&hadc1,50);
-	  adc_value_9 = HAL_ADC_GetValue(&hadc1); // Left POT
-	  HAL_ADC_Stop(&hadc1);
-
-	  Fire_Rate = (4096-adc_value_9)*100/4096;
-
-	  snprintf(msg, sizeof(msg), "BL: %i FL: %i BR: %i FR: %i \n\r",!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5), !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8),
-			  	  	  	  	  	  	  	  	  	  	  	  	  	  	!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7),!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9));
-	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, 100,500);
-	  memset(msg,0, sizeof msg);
+//	  snprintf(msg, sizeof(msg), "idx: %i mode_state: %i \n\r",idx, mode_state);
+//	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, 100,500);
+//	  memset(msg,0, sizeof msg);
 
 	  // ESC Startup Procedure
 	  if (!startup) {
@@ -286,182 +291,283 @@ int main(void)
 
 
 
-	  // Fire Trigger Logic
-	  if (!HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_3) && HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_9)){
-
-		  // Safety Switch
-//		  if (HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_9)){
-//			  state = 0;
-//		  }
-//		  else{
-//			  state = 1;
-//		  }
-
-
-
-//		  	 // LEFT Solenoid
-//
-//		  	  if ( ((curr_tick - left_tick) > Fire_Rate)){
-//		  		  if ((dart_counter < idx) &&!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5)){
-//		  			  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
-//		  			  left_tick = curr_tick;
-//		  			  dart_counter += 1;
-//		  		  }
-//		  		  else if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8)){
-//		  		      HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
-//
-//		  		  }
-//
-//		  	  }
-
-
-//		     // RIGHT Solenoid
-//			  if ( ((curr_tick - right_tick) > Fire_Rate)){
-//				  if ((dart_counter < idx) &&!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7)){
-//					  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_SET);
-//					  right_tick = curr_tick;
-//					  dart_counter += 1;
-//				  }
-//				  else if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9)){
-//					  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
-//
-//				  }
-//
-//			  }
-
-
-
-
-		  // ALTERNATE FSM
-		  if (alt_state == 0){
-			  if (last_fired == 0) {
-				  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
-				  left_tick = curr_tick;
-				  alt_state = 1;
-				  dart_counter++;
-				  last_fired = 1;
-			  }
-			  else{
-				  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_SET);
-				  right_tick = curr_tick;
-				  alt_state = 2;
-				  dart_counter++;
-				  last_fired = 0;
-			  }
-
+	  // Setting Types (Single, Burst, Auto)
+	  if (!HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_8) && type_flag == 0 && HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_9)) {
+		  type_flag = 1;
+		  type_tick = curr_tick;
+			 // do type_state stuff
+		  type++;
+		  set_LED_states(mode_state, type);
+		  idx = type_list[type%3];
 
 		  }
+	  else if(HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_8) && (curr_tick - type_tick) > 250 && type_flag ==1){ //
+		  type_flag = 0;
 
-		  else if (alt_state == 1){
-			  if (dart_counter == idx){
-				  alt_state = 3;
-			  }
-			  else if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7) && (curr_tick-left_tick > Fire_Rate)){
-				  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_SET);
-				  dart_counter ++;
-				  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
-				  right_tick = curr_tick;
-				  last_fired = 1;
-				  alt_state = 2;
-			  }
+	  }
 
+	  // Setting Modes (L, Both, Alt, R)
+	  if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_15) && mode_flag == 0 && HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_9)) {
+		  mode_flag = 1;
+		  mode_tick = curr_tick;
+
+		  if (mode_state == 3){
+			  mode_state = 0;
 		  }
-
-		  else if (alt_state == 2){
-			  if (dart_counter == idx){
-				  alt_state = 3;
-			  }
-			  else if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9) && (curr_tick - right_tick > Fire_Rate)){
-				  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
-				  dart_counter ++;
-				  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
-				  left_tick = curr_tick;
-				  last_fired = 0;
-				  alt_state = 1;
-			  }
-
-
-		  }
-
-		  else if (alt_state == 3){
-			  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
-			  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
-
-		  }
-
 		  else{
-			  alt_state = 0;
-		  }
-
-//		  if (dart_counter < idx){
-//
-//				  if (!L_flag && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5)){
-//					  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
-//					  L_flag = 1;
-//					  left_tick = curr_tick;
-//				  }
-//
-//				  else if ((!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7) && (curr_tick-left_tick > Fire_Rate))) {
-//		  			  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_SET);
-//		  			  dart_counter ++;
-//		  			  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
-//		  			  right_tick = curr_tick;
-//		  			  L_flag = 1;
-//
-//
-//		  		  }
-//
-//		  		  else if ( !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9) && (curr_tick - right_tick > Fire_Rate)){
-//		  			  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
-//		  			  dart_counter ++;
-//		  			  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
-//		  			  left_tick = curr_tick;
-//
-//		  		  }
-//
-//		  	  }
-//		  	  else{
-//		  		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
-//		  		HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
-//		  	  }
-//		  		  else if(dart_counter > idx){
-//		  			HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
-//		  			HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
-//		  		  }
-
-
-//		  	  // AUTO_BOTH
-//		  	  if ((curr_tick-left_tick) > Fire_Rate){
-//		  		  if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5)){
-//		  			  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_SET);
-//		  			  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
-//		  			  left_tick = curr_tick;
-//
-//		  		  }
-//		  		  else if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8)){
-//		  			  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
-//		  			  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
-//
-//		  		  }
-//		  	  }
+			  mode_state++;
 
 		  }
+		  set_LED_states(mode_state, type);
+
+		  }
+	  else if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_15) && (curr_tick - mode_tick) > 250 && mode_flag == 1){
+		  mode_flag = 0;
+	  }
+
+
+	  // Trigger State Machine
+	  // Off state
+	  if (shoot_state == 0){
+		  if (!HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_9)){
+			  shoot_state = 4;
+			  LED_Safety(mode_state, type);
+		  }
+		  if (!HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_3) && HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_9)){
+			shoot_state = 1;
+			shoot_flag = 1;
+			shoot_tick = curr_tick;
+		  }
+	  }
+	  // Rising Edge State
+	  else if(shoot_state == 1){
+		  if (!HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_9)){
+			  shoot_state = 4;
+			  LED_Safety(mode_state, type);
+		  }
+		  else if (curr_tick - shoot_tick > 10){
+			  shoot_state = 2;
+		  }
+	  }
+	  // On state
+	  else if(shoot_state == 2){
+		  if (!HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_9)){
+			  shoot_state = 4;
+			  LED_Safety(mode_state, type);
+		  }
+		  else if (HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_3)){
+			  shoot_state = 3;
+			  shoot_flag = 0;
+			  shoot_tick = curr_tick;
+		  }
+	  }
+	  // Falling Edge state
+	  else if(shoot_state == 3) {
+		  if (!HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_9)){
+			  shoot_state = 4;
+			  LED_Safety(mode_state, type);
+		  }
+		  else if (curr_tick - shoot_tick > 10){
+			  shoot_state = 0;
+		  }
+	  }
+	  // Safety State
+	  else if(shoot_state == 4){
+		  shoot_flag = 0;
+		  if (HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_9) && HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_3)){
+			  shoot_state = 0;
+			  set_LED_states(mode_state, type);
+		  }
+
+	  }
+
+
+
+
+	  // Fire Trigger Logic
+	  if (shoot_flag){
+		  trigger_flag = 1;
+		  trigger_tick = curr_tick;
+
+		  // Left State
+		  if (mode_state == 0){
+
+			  if (left_state == 0){
+				  left_tick = curr_tick;
+				  left_state = 1;
+
+			  }
+			  else if(left_state == 1){
+
+				  if ((dart_counter < idx) &&!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5) && ((curr_tick - left_tick) > Fire_Rate+10)){
+					  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
+					  left_tick = curr_tick;
+					  dart_counter += 1;
+				  }
+				  else if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8)){
+					  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
+
+				  }
+			  }
+
+
+		  }
+
+		  // Alt State
+		  else if (mode_state == 1){
+			  if (alt_state == 0){
+				  left_tick = curr_tick;
+				  right_tick = curr_tick;
+				  if (last_fired == 0) {
+						  alt_state = 1;
+					  }
+
+				  else{
+						  alt_state = 2;
+					  }
+
+			  }
+
+
+			  else if (alt_state == 1){
+
+				  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
+				  last_fired = 1;
+
+				  if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7) && (curr_tick-left_tick > Fire_Rate)){
+					  dart_counter++;
+
+					  if (dart_counter == idx){
+						  alt_state = 3;
+					  }
+					  else{
+					  alt_state = 2;
+					  right_tick = curr_tick;
+
+					  }
+				  }
+
+			  }
+
+			  else if (alt_state == 2){
+				  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
+				  last_fired = 0;
+
+				  if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9) && (curr_tick - right_tick > Fire_Rate)){
+					  dart_counter ++;
+
+					  if (dart_counter == idx){
+						  alt_state = 3;
+					  }
+					  else{
+					  alt_state = 1;
+					  left_tick = curr_tick;
+					  }
+				  }
+
+
+			  }
+
+			  else if (alt_state == 3){
+				  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
+				  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
+
+			  }
+
+		  }
+
+
+		  // Both State
+		  else if (mode_state == 2){
+
+			  if (both_state == 0){
+				  left_tick = curr_tick;
+				  both_state = 1;
+
+			  }
+
+			  else if (both_state == 1){
+
+
+					  if (dart_counter < (idx) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5) && (curr_tick-left_tick) > (Fire_Rate+10)){
+						  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_SET);
+						  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
+						  left_tick = curr_tick;
+						  dart_counter += 2;
+					  }
+
+					  else if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8)){
+						  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
+						  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
+					  }
+
+			  }
+
+
+		  }
+
+		  // Right
+		  else if (mode_state == 3){
+
+			  if (right_state == 0){
+				  right_tick = curr_tick;
+				  right_state = 1;
+
+			  }
+
+			  else if (right_state == 1){
+
+				  if ((dart_counter < idx) &&!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7) && (curr_tick - right_tick) > Fire_Rate+107){
+					  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_SET);
+					  right_tick = curr_tick;
+					  dart_counter += 1;
+				  }
+				  else if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9)){
+					  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
+
+				  }
+			  }
+		  }
+
+
+	  }
 
 	  else{
 		  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
 		  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
-		  R_flag = 0;
-		  L_flag = 0;
 		  dart_counter = 0;
 		  alt_state = 0;
+		  both_state = 0;
+		  left_state = 0;
+		  right_state = 0;
+
+		  ADC_Select_CH2();
+		  HAL_ADC_Start(&hadc1);
+		  HAL_ADC_PollForConversion(&hadc1,50);
+		  adc_value_2 = HAL_ADC_GetValue(&hadc1); // Right POT
+		  HAL_ADC_Stop(&hadc1);
+
+		  counts = adc_value_2*(2000-1500)/(4096 - 0) + 1500;
+
+		  ADC_Select_CH9();
+		  HAL_ADC_Start(&hadc1);
+		  HAL_ADC_PollForConversion(&hadc1,50);
+		  adc_value_9 = HAL_ADC_GetValue(&hadc1); // Left POT
+		  HAL_ADC_Stop(&hadc1);
+
+		  Fire_Rate = (4096-adc_value_9)*100/4096;
+
+
 	  }
 
 
 
-	  }
 
   }
   /* USER CODE END 3 */
+}
 
 /**
   * @brief System Clock Configuration
@@ -645,7 +751,7 @@ static void MX_TIM3_Init(void)
   htim3.Instance = TIM3;
   htim3.Init.Prescaler = 0;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 65535;
+  htim3.Init.Period = 119;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_PWM_Init(&htim3) != HAL_OK)
@@ -756,6 +862,22 @@ static void MX_USART1_UART_Init(void)
 }
 
 /**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Stream4_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream4_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream4_IRQn);
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -789,8 +911,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : REV_Pin FIRE_Pin SAFETY_Pin */
-  GPIO_InitStruct.Pin = REV_Pin|FIRE_Pin|SAFETY_Pin;
+  /*Configure GPIO pins : REV_Pin FIRE_Pin USER1_Pin SAFETY_Pin */
+  GPIO_InitStruct.Pin = REV_Pin|FIRE_Pin|USER1_Pin|SAFETY_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
@@ -810,6 +932,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : USER2_Pin */
+  GPIO_InitStruct.Pin = USER2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(USER2_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : BL_Pin FL_Pin FR_Pin */
   GPIO_InitStruct.Pin = BL_Pin|FL_Pin|FR_Pin;
@@ -833,18 +961,213 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
+void Set_LED (int LEDnum, int Red, int Green, int Blue)
+{
+	LED_Data[LEDnum][0] = LEDnum;
+	LED_Data[LEDnum][1] = Green;
+	LED_Data[LEDnum][2] = Red;
+	LED_Data[LEDnum][3] = Blue;
+}
 
-//void ADC_IRQHandler(void)
-//{
-//
-//  HAL_ADC_IRQHandler(&hadc1); // Call HAL ADC IRQ handler
-//}
-//
-//void HAL_ADC_ConvtCpltCallback (ADC_HandleTypeDef *hadc) {
-//  adc_value[adcIdx] = HAL_ADC_GetValue (&hadc1);
-//
-//  adcIdx = (adcIdx + 1) % 3;
-//}
+void clear_LEDs(void)
+{
+	for (int i=0; i<MAX_LED; i++)
+	{
+		Set_LED(i,0,0,0);
+	}
+}
+
+void set_LED_states(int mode, int lgtype)
+{
+
+	// Mode Selection
+	int r1 = 63;
+	int g1 = 63;
+	int b1 = 63;
+	// Crosshair
+	int r2 = 120;
+	int g2 = 20;
+	int b2 = 5;
+
+	// determine which fire type is active (single, burst, auto)
+	int firetype = lgtype%3;
+
+	//LED matrix follows an S pattern starting from right to left
+	//Must do some funky conversion to match the firemode/type grid on the blaster
+
+	clear_LEDs();
+
+	// Row 1
+	if(firetype == 0)
+	{
+		for(int i=0; i<4; i++)
+		{
+			Set_LED(3-i, r2, g2, b2);
+		}
+
+		Set_LED(3-mode, r1, g1, b1);
+
+		Set_LED(4 + mode, r2, g2, b2);
+		Set_LED(11 - mode, r2, g2, b2);
+
+
+
+	}
+	else if (firetype == 1)
+	{
+	// Row 2
+		for(int i=0; i<4; i++)
+		{
+			Set_LED(i+4, r2, g2, b2);
+		}
+
+		Set_LED(4 + mode, r1, g1, b1);
+
+		Set_LED(3-mode, r2, g2, b2);
+		Set_LED(11 - mode, r2, g2, b2);
+
+
+	}
+	else if (firetype == 2)
+	{
+	// Row 3
+		for(int i=0; i<4; i++)
+		{
+			Set_LED(11-i, r2, g2, b2);
+		}
+
+		Set_LED(11 - mode, r1, g1, b1);
+
+		Set_LED(4 + mode, r2, g2, b2);
+		Set_LED(3-mode, r2, g2, b2);
+
+	}
+
+	WS2812_Send();
+}
+
+#define PI 3.14159265
+
+void Set_Brightness (int brightness)  // 0-45
+{
+	#if USE_BRIGHTNESS
+
+		if (brightness > 45) brightness = 45;
+		for (int i=0; i<MAX_LED; i++)
+		{
+			LED_Mod[i][0] = LED_Data[i][0];
+			for (int j=1; j<4; j++)
+			{
+				float angle = 90-brightness;  // in degrees
+				angle = angle*PI / 180;  // in rad
+				LED_Mod[i][j] = (LED_Data[i][j])/(tan(angle));
+			}
+		}
+
+	#endif
+}
+
+void LED_Safety(int mode, int lgtype){
+
+	int firetype = lgtype%3;
+	int r2 = 63;
+	int g2 = 0;
+	int b2 = 0;
+
+	if(firetype == 0)
+		{
+			for(int i=0; i<4; i++)
+			{
+				Set_LED(3-i, r2, g2, b2);
+			}
+
+
+			Set_LED(4 + mode, r2, g2, b2);
+			Set_LED(11 - mode, r2, g2, b2);
+
+
+
+		}
+		else if (firetype == 1)
+		{
+		// Row 2
+			for(int i=0; i<4; i++)
+			{
+				Set_LED(i+4, r2, g2, b2);
+			}
+
+			Set_LED(3-mode, r2, g2, b2);
+			Set_LED(11 - mode, r2, g2, b2);
+
+
+		}
+		else if (firetype == 2)
+		{
+		// Row 3
+			for(int i=0; i<4; i++)
+			{
+				Set_LED(11-i, r2, g2, b2);
+			}
+
+			Set_LED(4 + mode, r2, g2, b2);
+			Set_LED(3-mode, r2, g2, b2);
+
+		}
+
+		WS2812_Send();
+
+
+}
+
+
+
+
+void WS2812_Send (void)
+{
+	uint32_t indx=0;
+	uint32_t color;
+
+
+	for (int i= 0; i<MAX_LED; i++)
+	{
+		#if USE_BRIGHTNESS
+				color = ((LED_Mod[i][1]<<16) | (LED_Mod[i][2]<<8) | (LED_Mod[i][3]));
+		#else
+				color = ((LED_Data[i][1]<<16) | (LED_Data[i][2]<<8) | (LED_Data[i][3]));
+		#endif
+
+		for (int i=23; i>=0; i--)
+		{
+			if (color&(1<<i))
+			{
+				pwmData[indx] = 80;  // 2/3 of 120
+			}
+
+			else pwmData[indx] = 40;  // 1/3 of 120
+
+			indx++;
+		}
+
+	}
+
+	for (int i=0; i<50; i++)
+	{
+		pwmData[indx] = 0;
+		indx++;
+	}
+
+	HAL_TIM_PWM_Start_DMA(&htim3, TIM_CHANNEL_1, (uint32_t *)pwmData, indx);
+	while (!datasentflag){};
+	datasentflag = 0;
+}
+
+
+
+void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
+{
+	HAL_TIM_PWM_Stop_DMA(&htim3, TIM_CHANNEL_1);
+	datasentflag=1;
+}
 
 /* USER CODE END 4 */
 

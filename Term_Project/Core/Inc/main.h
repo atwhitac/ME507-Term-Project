@@ -75,6 +75,10 @@ void Error_Handler(void);
 #define INH_2_GPIO_Port GPIOB
 #define IN2_1_Pin GPIO_PIN_14
 #define IN2_1_GPIO_Port GPIOB
+#define USER2_Pin GPIO_PIN_15
+#define USER2_GPIO_Port GPIOB
+#define USER1_Pin GPIO_PIN_8
+#define USER1_GPIO_Port GPIOA
 #define SAFETY_Pin GPIO_PIN_9
 #define SAFETY_GPIO_Port GPIOA
 #define BL_Pin GPIO_PIN_5
@@ -91,6 +95,18 @@ void Error_Handler(void);
 #define FR_EXTI_IRQn EXTI9_5_IRQn
 
 /* USER CODE BEGIN Private defines */
+
+void Set_LED (int LEDnum, int Red, int Green, int Blue);
+
+void set_LED_states(int mode, int lgtype);
+
+void clear_LEDs(void);
+
+void Set_Brightness (int brightness);
+
+void WS2812_Send (void);
+
+void LED_Safety(int mode, int lgtype);
 
 /* USER CODE END Private defines */
 
