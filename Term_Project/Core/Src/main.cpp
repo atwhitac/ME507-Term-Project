@@ -24,6 +24,7 @@
 #include "string.h"
 #include "MotorDriver.h"
 #include "stm32f4xx_hal.h"
+#include "RCReceiver.h"
 #include <cstdio>
 /* USER CODE END Includes */
 
@@ -45,6 +46,7 @@
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
 
+TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim4;
@@ -54,55 +56,75 @@ UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
 
+// LED variables
 #define MAX_LED 12
 #define USE_BRIGHTNESS 0
-
 uint8_t LED_Data[MAX_LED][4];
 uint8_t LED_Mod[MAX_LED][4];
-
 uint16_t pwmData[(24*MAX_LED)+50];
-
 volatile int datasentflag = 1;
 
-int16_t duty = 0;
-uint8_t flag = 0;
-uint16_t counts = 1600;
-uint8_t rev_flag = 0;
-uint8_t fire_flag = 0;
+
+// Motor variables
 uint8_t startup = 0;
-uint8_t BL = 0;
-uint8_t BR = 0;
-uint8_t FL = 0;
-uint8_t FR = 0;
-uint16_t curr_tick;
-uint16_t left_tick;
-uint16_t right_tick;
-uint8_t L_flag = 0;
-uint8_t R_flag = 0;
-uint16_t adc_value_9;
-uint16_t adc_value_2;
-uint8_t state = 0;
-uint16_t Fire_Rate;
+uint8_t rev_flag = 0;
+uint16_t rev_tick = 0;
+
+
+// Shoot variables
 uint16_t dart_counter = 0;
 uint16_t idx = 1;
 uint8_t last_fired = 0;
-uint8_t alt_state = 0;
-uint8_t type = 0;
-uint8_t type_tick = 0;
+
+
+// Mode variables
+// Timer that updates every while loop iteration
+uint16_t curr_tick;
+// Handles trigger logic=
+uint8_t trigger_tick = 0;
+uint8_t trigger_flag = 0;
+// Handles shooting logic
+uint16_t shoot_flag = 0;
+uint16_t shoot_state = 4; // Start in safety
+uint16_t shoot_tick = 0;
+// Handles mode selection
 uint8_t mode_state = 0;
 uint8_t mode_flag = 0;
 uint16_t mode_tick = 0;
-uint16_t type_list[] = {1,4,500};
-uint8_t type_flag = 0;
-uint8_t trigger_tick = 0;
-uint8_t trigger_flag = 0;
-uint16_t shoot_flag = 0;
-uint16_t shoot_state = 4; // Start in Safety
-uint16_t shoot_tick = 0;
-uint8_t both_state = 0;
 uint8_t left_state = 0;
+uint8_t alt_state = 0;
+uint8_t both_state = 0;
 uint8_t right_state = 0;
+// Timing for each solenoid
+uint16_t left_tick;
+uint16_t right_tick;
 
+
+// ADC variables
+uint16_t adc_value_9;
+uint16_t adc_value_2;
+uint16_t Fire_Rate;
+uint16_t counts = 1600;
+
+
+// User interface variables
+// Handles type selection
+uint8_t type = 0;
+uint8_t type_tick = 0;
+uint16_t type_list[] = {1,4,500}; // Dart capacities for each type
+uint8_t type_flag = 0;
+
+
+// RCReceiver object
+RCReceiver receiver1(&htim1, TIM_CHANNEL_3);
+int16_t signal1 = 1500;
+
+
+// UART Message for Debugging
+char msg[100];
+
+
+// ADC Channel selection functions
 static void ADC_Select_CH9 (void)
 {
 	ADC_ChannelConfTypeDef sConfig = {0};
@@ -130,29 +152,6 @@ static void ADC_Select_CH2 (void)
 	    Error_Handler();
 	  }
 }
-// UART Message for Debugging
-char msg[100];
-char msg2[100];
-
-//enum MODE {
-//	// Syntax follows: MODE_MAGSELECTION
-//	SAFETY,
-//	SINGLE_LEFT,
-//	SINGLE_RIGHT,
-//	SINGLE_ALT,
-//	SINGLE_BOTH,
-//	BURST_LEFT,
-//	BURST_RIGHT,
-//	BURST_ALT,
-//	BURST_BOTH,
-//	AUTO_LEFT,
-//	AUTO_RIGHT,
-//	AUTO_ALT,
-//	AUTO_BOTH,
-//};
-
-// Beam Brake Flags
-
 
 
 /* USER CODE END PV */
@@ -166,6 +165,7 @@ static void MX_TIM3_Init(void);
 static void MX_TIM4_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_USART1_UART_Init(void);
+static void MX_TIM1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -210,30 +210,17 @@ int main(void)
   MX_TIM4_Init();
   MX_ADC1_Init();
   MX_USART1_UART_Init();
+  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
 
-//  HAL_NVIC_SetPriority(ADC_IRQn, 0, 0);
-//  HAL_NVIC_EnableIRQ(ADC_IRQn);
-
+  // Initializations
   HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_2);
-//  HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_1);
+  HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_3);
   HAL_ADC_Start(&hadc1);
   HAL_ADC_Init(&hadc1);
 
-
-
-  // Solenoid 1 Pins
-//  HAL_GPIO_Init(GPIOA,3); // IN1_1
-//  HAL_GPIO_Init(GPIOA,7); // INH_1
-//  HAL_GPIO_Init(GPIOB,0); // IN1_2
-//  // Solenoid 2 Pins
-//  HAL_GPIO_Init(GPIOA,10); // IN2_1
-//  HAL_GPIO_Init(GPIOA,11); // INH_2
-//  HAL_GPIO_Init(GPIOA,12); // IN2_2
-  // Button Pin
-//  HAL_GPIO_Init(GPIOA,GPIO_PIN_0);
 
   // Set the solenoid pin states
   HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,GPIO_PIN_SET);
@@ -241,10 +228,13 @@ int main(void)
   HAL_GPIO_WritePin(GPIOB,GPIO_PIN_14,GPIO_PIN_SET);
   HAL_GPIO_WritePin(GPIOB,GPIO_PIN_12,GPIO_PIN_RESET);
 
+
   // Disable solenoids to start
   HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7,GPIO_PIN_RESET);
   HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13,GPIO_PIN_RESET);
 
+
+  // Initialize LEDs in safety mode
   LED_Safety(mode_state,type);
 
 
@@ -258,15 +248,22 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
+	  // RC Receiver E-Stop
+	  signal1 = receiver1.get_signal();
+	  if ((signal1 > 1600 || signal1 < 1400)){
+		  shoot_state = 4; // go to safety state if RC receiver triggered
+		  LED_Safety(mode_state, type);
+	  }
 
-
+	  // Get time elapsed every loop
 	  curr_tick = HAL_GetTick();
 
-
-
-//	  snprintf(msg, sizeof(msg), "idx: %i mode_state: %i \n\r",idx, mode_state);
+//	  // UART debugging
+//	  snprintf(msg, sizeof(msg), "BL: %i BR: %i FL: %i FR: %i  \n\r",!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5), !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7),
+//			  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	   !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8), !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9));
 //	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, 100,500);
 //	  memset(msg,0, sizeof msg);
+
 
 	  // ESC Startup Procedure
 	  if (!startup) {
@@ -277,16 +274,24 @@ int main(void)
 		  startup = 1;
 	  }
 
-
 	  // Rev Trigger Logic
-	  if (HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_4) && HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_9)){
+	  if (HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_4) && (HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_9) && !(shoot_state == 4))){
 		  // Rev the motors
 		  		__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_1, counts);
 		  		__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_2, counts);
+//		  		trigger_tick = curr_tick;
 	  }
+
+//	  else if(trigger_flag == 1 && (curr_tick-trigger_tick <1000)){
+//		  // Set motors to neutral state
+//		  __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_1, counts);
+//		  __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_2, counts);
+//
+//	  }
 	  else{
 		  __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_1, 1000);
 		  __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_2, 1000);
+//		  trigger_flag = 0;
 	  }
 
 
@@ -295,7 +300,6 @@ int main(void)
 	  if (!HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_8) && type_flag == 0 && HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_9)) {
 		  type_flag = 1;
 		  type_tick = curr_tick;
-			 // do type_state stuff
 		  type++;
 		  set_LED_states(mode_state, type);
 		  idx = type_list[type%3];
@@ -316,10 +320,8 @@ int main(void)
 		  }
 		  else{
 			  mode_state++;
-
 		  }
 		  set_LED_states(mode_state, type);
-
 		  }
 	  else if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_15) && (curr_tick - mode_tick) > 250 && mode_flag == 1){
 		  mode_flag = 0;
@@ -339,6 +341,7 @@ int main(void)
 			shoot_tick = curr_tick;
 		  }
 	  }
+
 	  // Rising Edge State
 	  else if(shoot_state == 1){
 		  if (!HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_9)){
@@ -349,6 +352,7 @@ int main(void)
 			  shoot_state = 2;
 		  }
 	  }
+
 	  // On state
 	  else if(shoot_state == 2){
 		  if (!HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_9)){
@@ -369,12 +373,17 @@ int main(void)
 		  }
 		  else if (curr_tick - shoot_tick > 10){
 			  shoot_state = 0;
+			  rev_tick = curr_tick;
 		  }
 	  }
 	  // Safety State
 	  else if(shoot_state == 4){
 		  shoot_flag = 0;
-		  if (HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_9) && HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_3)){
+		  __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_1, 1000);
+		  __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_2, 1000);
+		  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
+		  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
+		  if (HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_9) && HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_3) && (signal1 < 1600 && signal1 > 1400)){
 			  shoot_state = 0;
 			  set_LED_states(mode_state, type);
 		  }
@@ -386,9 +395,7 @@ int main(void)
 
 	  // Fire Trigger Logic
 	  if (shoot_flag){
-		  trigger_flag = 1;
-		  trigger_tick = curr_tick;
-
+//		  trigger_tick = curr_tick;
 		  // Left State
 		  if (mode_state == 0){
 
@@ -399,7 +406,7 @@ int main(void)
 			  }
 			  else if(left_state == 1){
 
-				  if ((dart_counter < idx) &&!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5) && ((curr_tick - left_tick) > Fire_Rate+10)){
+				  if ((dart_counter < idx) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5) && ((curr_tick - left_tick) > Fire_Rate+10)){
 					  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
 					  left_tick = curr_tick;
 					  dart_counter += 1;
@@ -409,8 +416,6 @@ int main(void)
 
 				  }
 			  }
-
-
 		  }
 
 		  // Alt State
@@ -514,12 +519,11 @@ int main(void)
 			  if (right_state == 0){
 				  right_tick = curr_tick;
 				  right_state = 1;
-
 			  }
 
 			  else if (right_state == 1){
 
-				  if ((dart_counter < idx) &&!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7) && (curr_tick - right_tick) > Fire_Rate+107){
+				  if ((dart_counter < idx) &&!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7) && (curr_tick - right_tick) > Fire_Rate+10){
 					  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_SET);
 					  right_tick = curr_tick;
 					  dart_counter += 1;
@@ -535,6 +539,8 @@ int main(void)
 	  }
 
 	  else{
+
+
 		  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
 		  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
 		  dart_counter = 0;
@@ -549,7 +555,7 @@ int main(void)
 		  adc_value_2 = HAL_ADC_GetValue(&hadc1); // Right POT
 		  HAL_ADC_Stop(&hadc1);
 
-		  counts = adc_value_2*(2000-1500)/(4096 - 0) + 1500;
+		  counts = adc_value_2*(1500-1000)/(4096 - 0) + 1000;
 
 		  ADC_Select_CH9();
 		  HAL_ADC_Start(&hadc1);
@@ -664,6 +670,55 @@ static void MX_ADC1_Init(void)
 
 
   /* USER CODE END ADC1_Init 2 */
+
+}
+
+/**
+  * @brief TIM1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM1_Init(void)
+{
+
+  /* USER CODE BEGIN TIM1_Init 0 */
+
+  /* USER CODE END TIM1_Init 0 */
+
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+  TIM_IC_InitTypeDef sConfigIC = {0};
+
+  /* USER CODE BEGIN TIM1_Init 1 */
+
+  /* USER CODE END TIM1_Init 1 */
+  htim1.Instance = TIM1;
+  htim1.Init.Prescaler = 95;
+  htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim1.Init.Period = 65535;
+  htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim1.Init.RepetitionCounter = 0;
+  htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_IC_Init(&htim1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_BOTHEDGE;
+  sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
+  sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
+  sConfigIC.ICFilter = 0;
+  if (HAL_TIM_IC_ConfigChannel(&htim1, &sConfigIC, TIM_CHANNEL_3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM1_Init 2 */
+
+  /* USER CODE END TIM1_Init 2 */
 
 }
 
@@ -898,8 +953,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, IN1_1_Pin|INH_1_Pin|GPIO_PIN_10|GPIO_PIN_11
-                          |GPIO_PIN_12, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, IN1_1_Pin|INH_1_Pin|GPIO_PIN_11|GPIO_PIN_12, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, IN1_2_Pin|IN1_1B12_Pin|INH_2_Pin|IN2_1_Pin, GPIO_PIN_RESET);
@@ -917,10 +971,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : IN1_1_Pin INH_1_Pin PA10 PA11
-                           PA12 */
-  GPIO_InitStruct.Pin = IN1_1_Pin|INH_1_Pin|GPIO_PIN_10|GPIO_PIN_11
-                          |GPIO_PIN_12;
+  /*Configure GPIO pins : IN1_1_Pin INH_1_Pin PA11 PA12 */
+  GPIO_InitStruct.Pin = IN1_1_Pin|INH_1_Pin|GPIO_PIN_11|GPIO_PIN_12;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -961,6 +1013,17 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
+
+
+
+	if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3){
+		receiver1.trigger_signal();
+	}
+
+
+}
+
 void Set_LED (int LEDnum, int Red, int Green, int Blue)
 {
 	LED_Data[LEDnum][0] = LEDnum;
@@ -984,10 +1047,20 @@ void set_LED_states(int mode, int lgtype)
 	int r1 = 63;
 	int g1 = 63;
 	int b1 = 63;
-	// Crosshair
-	int r2 = 120;
-	int g2 = 20;
+	// Background
+
+    // Orange
+	int r2 = 77;
+	int g2 = 30;
 	int b2 = 5;
+
+
+//	// Blue
+//	int r2 = 0;
+//	int g2 = 0;
+//	int b2 = 15;
+
+
 
 	// determine which fire type is active (single, burst, auto)
 	int firetype = lgtype%3;
@@ -1018,7 +1091,8 @@ void set_LED_states(int mode, int lgtype)
 	// Row 2
 		for(int i=0; i<4; i++)
 		{
-			Set_LED(i+4, r2, g2, b2);
+			Set_LED(4+i, r2, g2, b2);
+
 		}
 
 		Set_LED(4 + mode, r1, g1, b1);
@@ -1093,7 +1167,7 @@ void LED_Safety(int mode, int lgtype){
 		// Row 2
 			for(int i=0; i<4; i++)
 			{
-				Set_LED(i+4, r2, g2, b2);
+				Set_LED(4+i, r2, g2, b2);
 			}
 
 			Set_LED(3-mode, r2, g2, b2);
