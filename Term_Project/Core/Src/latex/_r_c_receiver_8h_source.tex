@@ -1,0 +1,40 @@
+\doxysection{RCReceiver.\+h}
+\hypertarget{_r_c_receiver_8h_source}{}\label{_r_c_receiver_8h_source}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ RCReceiver.h}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ \ Created\ on:\ May\ 13,\ 2024}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ \ \ \ \ \ Author:\ andyr}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#ifndef\ SRC\_RCRECEIVER\_H\_}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#define\ SRC\_RCRECEIVER\_H\_}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ "{}stm32f4xx\_hal.h"{}}}
+\DoxyCodeLine{00011\ }
+\DoxyCodeLine{00012\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_r_c_receiver}{RCReceiver}}\ \{}
+\DoxyCodeLine{00013\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00014\ \ \ \ \ TIM\_HandleTypeDef*\ timer;\ \textcolor{comment}{//\ like\ \&htim3}}
+\DoxyCodeLine{00015\ \ \ \ \ uint32\_t\ channel;}
+\DoxyCodeLine{00016\ \ \ \ \ uint16\_t\ count1;}
+\DoxyCodeLine{00017\ \ \ \ \ uint16\_t\ count2;}
+\DoxyCodeLine{00018\ \ \ \ \ uint16\_t\ diff;}
+\DoxyCodeLine{00019\ \ \ \ \ uint8\_t\ First\_Capture;}
+\DoxyCodeLine{00020\ \ \ \ \ int16\_t\ signal;}
+\DoxyCodeLine{00021\ \ \ \ \ uint8\_t\ flag;}
+\DoxyCodeLine{00022\ \ \ \ \ uint8\_t\ test;}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \mbox{\hyperlink{class_r_c_receiver}{RCReceiver}}(TIM\_HandleTypeDef*\ timer,\ uint32\_t\ channel);}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_r_c_receiver_a6bc8e462bbf308a2c4f6fe71d18260b8}{trigger\_signal}}();}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \ \ \ \ \ \ int16\_t\ \mbox{\hyperlink{class_r_c_receiver_a72e354d26dbdcff5110016683f8f8600}{get\_signal}}();}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \ \ \ \ \ \ uint8\_t\ \mbox{\hyperlink{class_r_c_receiver_a19efebc4c12bbd020f281419b567f9a9}{check\_flag}}();}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_r_c_receiver_adc9a6cf4ac808be86a426e2d8b3c86be}{set\_flag}}(uint8\_t\ n);}
+\DoxyCodeLine{00033\ \};}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ SRC\_RCRECEIVER\_H\_\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

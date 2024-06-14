@@ -1,0 +1,73 @@
+\doxysection{Motor\+Driver Class Reference}
+\hypertarget{class_motor_driver}{}\label{class_motor_driver}\index{MotorDriver@{MotorDriver}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_motor_driver_a0cac18aba12577ed641985743d6f4abf}{Motor\+Driver}} (TIM\+\_\+\+Handle\+Type\+Def \texorpdfstring{$\ast$}{*}timer, uint32\+\_\+t CH)
+\begin{DoxyCompactList}\small\item\em Constructor for the \doxylink{class_motor_driver}{Motor\+Driver} class. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_motor_driver_aa67f1c201f24daf9e9caa992b246c74e}{set\+\_\+duty}} (int32\+\_\+t duty)
+\begin{DoxyCompactList}\small\item\em Sets the duty cycle for the motor. \end{DoxyCompactList}\item 
+\Hypertarget{class_motor_driver_a1bf972aa3aa5984047b431ff54f9daee}\label{class_motor_driver_a1bf972aa3aa5984047b431ff54f9daee} 
+void {\bfseries enable} ()
+\begin{DoxyCompactList}\small\item\em Enables the motor driver by starting the Timer for PWM generation. \end{DoxyCompactList}\item 
+\Hypertarget{class_motor_driver_a1737b7014db2a659dd5268a0b04fec31}\label{class_motor_driver_a1737b7014db2a659dd5268a0b04fec31} 
+void {\bfseries disable} ()
+\begin{DoxyCompactList}\small\item\em Disables the motor driver by stopping the Timer for PWM generation . \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_motor_driver_a85d5f2481e8ed360a42355c340e51706}\label{class_motor_driver_a85d5f2481e8ed360a42355c340e51706} 
+TIM\+\_\+\+Handle\+Type\+Def \texorpdfstring{$\ast$}{*} {\bfseries timer}
+\item 
+\Hypertarget{class_motor_driver_a04a7e0df172c58fec85eedbe4d15d750}\label{class_motor_driver_a04a7e0df172c58fec85eedbe4d15d750} 
+int32\+\_\+t {\bfseries duty}
+\item 
+\Hypertarget{class_motor_driver_aa031548b4d636ad83768973bb5ee3786}\label{class_motor_driver_aa031548b4d636ad83768973bb5ee3786} 
+uint32\+\_\+t {\bfseries CH}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_motor_driver_a0cac18aba12577ed641985743d6f4abf}\label{class_motor_driver_a0cac18aba12577ed641985743d6f4abf} 
+\index{MotorDriver@{MotorDriver}!MotorDriver@{MotorDriver}}
+\index{MotorDriver@{MotorDriver}!MotorDriver@{MotorDriver}}
+\doxysubsubsection{\texorpdfstring{MotorDriver()}{MotorDriver()}}
+{\footnotesize\ttfamily Motor\+Driver\+::\+Motor\+Driver (\begin{DoxyParamCaption}\item[{TIM\+\_\+\+Handle\+Type\+Def \texorpdfstring{$\ast$}{*}}]{timer,  }\item[{uint32\+\_\+t}]{CH }\end{DoxyParamCaption})}
+
+
+
+Constructor for the \doxylink{class_motor_driver}{Motor\+Driver} class. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em timer} & A pointer to the timer address. \\
+\hline
+{\em FWD} & The forward direction PWM generation timer channel. \\
+\hline
+{\em BCK} & The backward direction PWM generation timer channel. \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_motor_driver_aa67f1c201f24daf9e9caa992b246c74e}\label{class_motor_driver_aa67f1c201f24daf9e9caa992b246c74e} 
+\index{MotorDriver@{MotorDriver}!set\_duty@{set\_duty}}
+\index{set\_duty@{set\_duty}!MotorDriver@{MotorDriver}}
+\doxysubsubsection{\texorpdfstring{set\_duty()}{set\_duty()}}
+{\footnotesize\ttfamily void Motor\+Driver\+::set\+\_\+duty (\begin{DoxyParamCaption}\item[{int32\+\_\+t}]{pwm }\end{DoxyParamCaption})}
+
+
+
+Sets the duty cycle for the motor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pwm} & The desired PWM percentage \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Motor\+Driver.\+h\item 
+\mbox{\hyperlink{_motor_driver_8cpp}{Motor\+Driver.\+cpp}}\end{DoxyCompactItemize}

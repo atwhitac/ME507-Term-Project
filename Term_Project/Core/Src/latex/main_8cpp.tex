@@ -1,0 +1,343 @@
+\doxysection{main.\+cpp File Reference}
+\hypertarget{main_8cpp}{}\label{main_8cpp}\index{main.cpp@{main.cpp}}
+
+
+\+: Main program body  
+
+
+{\ttfamily \#include "{}main.\+h"{}}\newline
+{\ttfamily \#include "{}string.\+h"{}}\newline
+{\ttfamily \#include "{}stm32f4xx\+\_\+hal.\+h"{}}\newline
+{\ttfamily \#include "{}RCReceiver.\+h"{}}\newline
+{\ttfamily \#include $<$cstdio$>$}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{main_8cpp_a73f7eec19bbf7b2b9199b8ff277bc980}\label{main_8cpp_a73f7eec19bbf7b2b9199b8ff277bc980} 
+\#define {\bfseries MAX\+\_\+\+LED}~12
+\item 
+\Hypertarget{main_8cpp_aa01a19b11b7371ca336b668d2b540e93}\label{main_8cpp_aa01a19b11b7371ca336b668d2b540e93} 
+\#define {\bfseries USE\+\_\+\+BRIGHTNESS}~0
+\item 
+\Hypertarget{main_8cpp_a598a3330b3c21701223ee0ca14316eca}\label{main_8cpp_a598a3330b3c21701223ee0ca14316eca} 
+\#define {\bfseries PI}~3.\+14159265
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{main_8cpp_a70af21c671abfcc773614a9a4f63d920}{System\+Clock\+\_\+\+Config}} (void)
+\begin{DoxyCompactList}\small\item\em System Clock Configuration. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{main_8cpp_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\begin{DoxyCompactList}\small\item\em The application entry point. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{main_8cpp_a77a2401a35ddd9bd0b8fc28331b81381}{HAL\+\_\+\+TIM\+\_\+\+IC\+\_\+\+Capture\+Callback}} (TIM\+\_\+\+Handle\+Type\+Def \texorpdfstring{$\ast$}{*}htim)
+\begin{DoxyCompactList}\small\item\em Timer Input Capture Callback. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{main_8cpp_a8d6329b804987f3dde157bcf7c6c6640}{Set\+\_\+\+LED}} (int LEDnum, int Red, int Green, int Blue)
+\begin{DoxyCompactList}\small\item\em Set the color of an LED. \end{DoxyCompactList}\item 
+\Hypertarget{main_8cpp_a8b88b793914719e504d3c78a03991cd7}\label{main_8cpp_a8b88b793914719e504d3c78a03991cd7} 
+void {\bfseries clear\+\_\+\+LEDs} (void)
+\begin{DoxyCompactList}\small\item\em Clear all LEDs. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{main_8cpp_a32a7378f8ecf47b27e2c54303f3b27b2}{set\+\_\+\+LED\+\_\+states}} (int mode, int lgtype)
+\begin{DoxyCompactList}\small\item\em Set the LED states based on mode and light type. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{main_8cpp_af4afcf37584b66e28753eab349ade16c}{Set\+\_\+\+Brightness}} (int brightness)
+\begin{DoxyCompactList}\small\item\em Set the brightness of the LEDs. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{main_8cpp_acf260f90c402befa02b5318efda8cc4e}{LED\+\_\+\+Safety}} (int mode, int lgtype)
+\begin{DoxyCompactList}\small\item\em Set the LEDs to safety mode based on mode and light type. \end{DoxyCompactList}\item 
+\Hypertarget{main_8cpp_a6be227c85ae79c14a68e2358161fd3ea}\label{main_8cpp_a6be227c85ae79c14a68e2358161fd3ea} 
+void {\bfseries WS2812\+\_\+\+Send} (void)
+\begin{DoxyCompactList}\small\item\em Send the LED data to the WS2812 LEDs. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{main_8cpp_a07e5fc4d223b16bec2fd6bed547cf91d}{HAL\+\_\+\+TIM\+\_\+\+PWM\+\_\+\+Pulse\+Finished\+Callback}} (TIM\+\_\+\+Handle\+Type\+Def \texorpdfstring{$\ast$}{*}htim)
+\begin{DoxyCompactList}\small\item\em Timer PWM Pulse Finished Callback. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{main_8cpp_a1730ffe1e560465665eb47d9264826f9}{Error\+\_\+\+Handler}} (void)
+\begin{DoxyCompactList}\small\item\em This function is executed in case of error occurrence. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{main_8cpp_a22b804736f5648d52f639b2647d4ed13}\label{main_8cpp_a22b804736f5648d52f639b2647d4ed13} 
+ADC\+\_\+\+Handle\+Type\+Def {\bfseries hadc1}
+\item 
+\Hypertarget{main_8cpp_a0f58ba2e45ec53ed7fdf4876d0d1d756}\label{main_8cpp_a0f58ba2e45ec53ed7fdf4876d0d1d756} 
+TIM\+\_\+\+Handle\+Type\+Def {\bfseries htim1}
+\item 
+\Hypertarget{main_8cpp_a2c80fd5510e2990a59a5c90d745c716c}\label{main_8cpp_a2c80fd5510e2990a59a5c90d745c716c} 
+TIM\+\_\+\+Handle\+Type\+Def {\bfseries htim2}
+\item 
+\Hypertarget{main_8cpp_aac3d2c59ee0e3bbae1b99529a154eb62}\label{main_8cpp_aac3d2c59ee0e3bbae1b99529a154eb62} 
+TIM\+\_\+\+Handle\+Type\+Def {\bfseries htim3}
+\item 
+\Hypertarget{main_8cpp_a85788cec5a97ee377e4ee2e74f026484}\label{main_8cpp_a85788cec5a97ee377e4ee2e74f026484} 
+TIM\+\_\+\+Handle\+Type\+Def {\bfseries htim4}
+\item 
+\Hypertarget{main_8cpp_a1c3d9bc8d51e819c8d5062a09eecc03d}\label{main_8cpp_a1c3d9bc8d51e819c8d5062a09eecc03d} 
+DMA\+\_\+\+Handle\+Type\+Def {\bfseries hdma\+\_\+tim3\+\_\+ch1\+\_\+trig}
+\item 
+\Hypertarget{main_8cpp_a2cf715bef37f7e8ef385a30974a5f0d5}\label{main_8cpp_a2cf715bef37f7e8ef385a30974a5f0d5} 
+UART\+\_\+\+Handle\+Type\+Def {\bfseries huart1}
+\item 
+\Hypertarget{main_8cpp_afec64929f70d57deee285219b58c64d2}\label{main_8cpp_afec64929f70d57deee285219b58c64d2} 
+uint8\+\_\+t {\bfseries LED\+\_\+\+Data} \mbox{[}MAX\+\_\+\+LED\mbox{]}\mbox{[}4\mbox{]}
+\item 
+\Hypertarget{main_8cpp_ad404eec47ab77aecf18978444ec6fb8b}\label{main_8cpp_ad404eec47ab77aecf18978444ec6fb8b} 
+uint8\+\_\+t {\bfseries LED\+\_\+\+Mod} \mbox{[}MAX\+\_\+\+LED\mbox{]}\mbox{[}4\mbox{]}
+\item 
+\Hypertarget{main_8cpp_a8d73a991ec74fa638c920d3439421b02}\label{main_8cpp_a8d73a991ec74fa638c920d3439421b02} 
+uint16\+\_\+t {\bfseries pwm\+Data} \mbox{[}(24 \texorpdfstring{$\ast$}{*}MAX\+\_\+\+LED)+50\mbox{]}
+\item 
+\Hypertarget{main_8cpp_a3cba214d1bc150694ab11da7ea8f7b93}\label{main_8cpp_a3cba214d1bc150694ab11da7ea8f7b93} 
+volatile int {\bfseries datasentflag} = 1
+\item 
+\Hypertarget{main_8cpp_a8c4819f1597a48481df403cfada7a07f}\label{main_8cpp_a8c4819f1597a48481df403cfada7a07f} 
+uint8\+\_\+t {\bfseries startup} = 0
+\item 
+\Hypertarget{main_8cpp_ae5c3ffa10b51f28c5e7f94605f0808d0}\label{main_8cpp_ae5c3ffa10b51f28c5e7f94605f0808d0} 
+uint8\+\_\+t {\bfseries rev\+\_\+flag} = 0
+\item 
+\Hypertarget{main_8cpp_a2a8b9def4231553eea24d6eb143b95c9}\label{main_8cpp_a2a8b9def4231553eea24d6eb143b95c9} 
+uint16\+\_\+t {\bfseries rev\+\_\+tick} = 0
+\item 
+\Hypertarget{main_8cpp_a702766927426358f5f3ed767dd9df5e0}\label{main_8cpp_a702766927426358f5f3ed767dd9df5e0} 
+uint16\+\_\+t {\bfseries dart\+\_\+counter} = 0
+\item 
+\Hypertarget{main_8cpp_a3621634c7d41edf167a313cdfe0648b6}\label{main_8cpp_a3621634c7d41edf167a313cdfe0648b6} 
+uint16\+\_\+t {\bfseries idx} = 1
+\item 
+\Hypertarget{main_8cpp_ac13c2405a90b2d6b2da360651cafd7fc}\label{main_8cpp_ac13c2405a90b2d6b2da360651cafd7fc} 
+uint8\+\_\+t {\bfseries last\+\_\+fired} = 0
+\item 
+\Hypertarget{main_8cpp_aeabfd4e5248cad6d443d067319ecfc60}\label{main_8cpp_aeabfd4e5248cad6d443d067319ecfc60} 
+uint16\+\_\+t {\bfseries curr\+\_\+tick}
+\item 
+\Hypertarget{main_8cpp_ab5fde2a9083420e015e70cd20f5e97e7}\label{main_8cpp_ab5fde2a9083420e015e70cd20f5e97e7} 
+uint8\+\_\+t {\bfseries trigger\+\_\+tick} = 0
+\item 
+\Hypertarget{main_8cpp_a9936fc99e11a2c691a582bcf47492a42}\label{main_8cpp_a9936fc99e11a2c691a582bcf47492a42} 
+uint8\+\_\+t {\bfseries trigger\+\_\+flag} = 0
+\item 
+\Hypertarget{main_8cpp_a20fe469690b83b5c36fcffdcd47812e0}\label{main_8cpp_a20fe469690b83b5c36fcffdcd47812e0} 
+uint16\+\_\+t {\bfseries shoot\+\_\+flag} = 0
+\item 
+\Hypertarget{main_8cpp_a9780f012d1dfbc134b3a4ac4abbb9910}\label{main_8cpp_a9780f012d1dfbc134b3a4ac4abbb9910} 
+uint16\+\_\+t {\bfseries shoot\+\_\+state} = 4
+\item 
+\Hypertarget{main_8cpp_a3ff208a1d144475a7b651c84a22ce06d}\label{main_8cpp_a3ff208a1d144475a7b651c84a22ce06d} 
+uint16\+\_\+t {\bfseries shoot\+\_\+tick} = 0
+\item 
+\Hypertarget{main_8cpp_a57751f3ccc9df6b53064e8a8546fd665}\label{main_8cpp_a57751f3ccc9df6b53064e8a8546fd665} 
+uint8\+\_\+t {\bfseries mode\+\_\+state} = 0
+\item 
+\Hypertarget{main_8cpp_adc2da3d57853307ca12bcc76aa5f2941}\label{main_8cpp_adc2da3d57853307ca12bcc76aa5f2941} 
+uint8\+\_\+t {\bfseries mode\+\_\+flag} = 0
+\item 
+\Hypertarget{main_8cpp_a6d546e534a42b448006de7e0907e8ef0}\label{main_8cpp_a6d546e534a42b448006de7e0907e8ef0} 
+uint16\+\_\+t {\bfseries mode\+\_\+tick} = 0
+\item 
+\Hypertarget{main_8cpp_ac75b75410706fdac3a82a694d998f0ad}\label{main_8cpp_ac75b75410706fdac3a82a694d998f0ad} 
+uint8\+\_\+t {\bfseries left\+\_\+state} = 0
+\item 
+\Hypertarget{main_8cpp_ac0b190b7767e0fadb7e96eb9480f7097}\label{main_8cpp_ac0b190b7767e0fadb7e96eb9480f7097} 
+uint8\+\_\+t {\bfseries alt\+\_\+state} = 0
+\item 
+\Hypertarget{main_8cpp_a2c59bb8019620fdc4b9742488cfb422b}\label{main_8cpp_a2c59bb8019620fdc4b9742488cfb422b} 
+uint8\+\_\+t {\bfseries both\+\_\+state} = 0
+\item 
+\Hypertarget{main_8cpp_acb8fa672902bcefa988f275c21058569}\label{main_8cpp_acb8fa672902bcefa988f275c21058569} 
+uint8\+\_\+t {\bfseries right\+\_\+state} = 0
+\item 
+\Hypertarget{main_8cpp_a2eb8b83683ad01a818b4467af0774a6d}\label{main_8cpp_a2eb8b83683ad01a818b4467af0774a6d} 
+uint16\+\_\+t {\bfseries left\+\_\+tick}
+\item 
+\Hypertarget{main_8cpp_ac5c8e259d1af18aaa6a94ad8e44773d7}\label{main_8cpp_ac5c8e259d1af18aaa6a94ad8e44773d7} 
+uint16\+\_\+t {\bfseries right\+\_\+tick}
+\item 
+\Hypertarget{main_8cpp_a09a791bb332e5145b80ee51cb7533426}\label{main_8cpp_a09a791bb332e5145b80ee51cb7533426} 
+uint16\+\_\+t {\bfseries adc\+\_\+value\+\_\+9}
+\item 
+\Hypertarget{main_8cpp_a2513de0b617fb0d192cb10b8409e0eb5}\label{main_8cpp_a2513de0b617fb0d192cb10b8409e0eb5} 
+uint16\+\_\+t {\bfseries adc\+\_\+value\+\_\+2}
+\item 
+\Hypertarget{main_8cpp_a46fdac61720b3e0143079cd4b57134f4}\label{main_8cpp_a46fdac61720b3e0143079cd4b57134f4} 
+uint16\+\_\+t {\bfseries Fire\+\_\+\+Rate}
+\item 
+\Hypertarget{main_8cpp_a5fb6b2fb3214e5a65fcd93da5d8aeb4f}\label{main_8cpp_a5fb6b2fb3214e5a65fcd93da5d8aeb4f} 
+uint16\+\_\+t {\bfseries counts} = 1600
+\item 
+\Hypertarget{main_8cpp_a1d127017fb298b889f4ba24752d08b8e}\label{main_8cpp_a1d127017fb298b889f4ba24752d08b8e} 
+uint8\+\_\+t {\bfseries type} = 0
+\item 
+\Hypertarget{main_8cpp_a8026960af39abcbfeee9b3ce00ac6645}\label{main_8cpp_a8026960af39abcbfeee9b3ce00ac6645} 
+uint8\+\_\+t {\bfseries type\+\_\+tick} = 0
+\item 
+\Hypertarget{main_8cpp_a398d7ccf2fd65ca588c43fe90113f083}\label{main_8cpp_a398d7ccf2fd65ca588c43fe90113f083} 
+uint16\+\_\+t {\bfseries type\+\_\+list} \mbox{[}$\,$\mbox{]} = \{1,4,500\}
+\item 
+\Hypertarget{main_8cpp_a23c27ec50bdd96564ff83ada455793fa}\label{main_8cpp_a23c27ec50bdd96564ff83ada455793fa} 
+uint8\+\_\+t {\bfseries type\+\_\+flag} = 0
+\item 
+\Hypertarget{main_8cpp_ab4be6b672a30da9d75c7a8f55fd373fa}\label{main_8cpp_ab4be6b672a30da9d75c7a8f55fd373fa} 
+int16\+\_\+t {\bfseries signal1} = 1500
+\item 
+\Hypertarget{main_8cpp_a184b5dd9844bf6e022deb71044ff7f64}\label{main_8cpp_a184b5dd9844bf6e022deb71044ff7f64} 
+char {\bfseries msg} \mbox{[}100\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\+: Main program body 
+
+\begin{DoxyAttention}{Attention}
+
+\end{DoxyAttention}
+Copyright (c) 2024 STMicroelectronics. All rights reserved.
+
+This software is licensed under terms that can be found in the LICENSE file in the root directory of this software component. If no LICENSE file comes with this software, it is provided AS-\/\+IS. 
+
+\doxysubsection{Function Documentation}
+\Hypertarget{main_8cpp_a1730ffe1e560465665eb47d9264826f9}\label{main_8cpp_a1730ffe1e560465665eb47d9264826f9} 
+\index{main.cpp@{main.cpp}!Error\_Handler@{Error\_Handler}}
+\index{Error\_Handler@{Error\_Handler}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{Error\_Handler()}{Error\_Handler()}}
+{\footnotesize\ttfamily void Error\+\_\+\+Handler (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+This function is executed in case of error occurrence. 
+
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+\Hypertarget{main_8cpp_a77a2401a35ddd9bd0b8fc28331b81381}\label{main_8cpp_a77a2401a35ddd9bd0b8fc28331b81381} 
+\index{main.cpp@{main.cpp}!HAL\_TIM\_IC\_CaptureCallback@{HAL\_TIM\_IC\_CaptureCallback}}
+\index{HAL\_TIM\_IC\_CaptureCallback@{HAL\_TIM\_IC\_CaptureCallback}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{HAL\_TIM\_IC\_CaptureCallback()}{HAL\_TIM\_IC\_CaptureCallback()}}
+{\footnotesize\ttfamily void HAL\+\_\+\+TIM\+\_\+\+IC\+\_\+\+Capture\+Callback (\begin{DoxyParamCaption}\item[{TIM\+\_\+\+Handle\+Type\+Def \texorpdfstring{$\ast$}{*}}]{htim }\end{DoxyParamCaption})}
+
+
+
+Timer Input Capture Callback. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em htim} & Pointer to the TIM handle \\
+\hline
+\end{DoxyParams}
+\Hypertarget{main_8cpp_a07e5fc4d223b16bec2fd6bed547cf91d}\label{main_8cpp_a07e5fc4d223b16bec2fd6bed547cf91d} 
+\index{main.cpp@{main.cpp}!HAL\_TIM\_PWM\_PulseFinishedCallback@{HAL\_TIM\_PWM\_PulseFinishedCallback}}
+\index{HAL\_TIM\_PWM\_PulseFinishedCallback@{HAL\_TIM\_PWM\_PulseFinishedCallback}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{HAL\_TIM\_PWM\_PulseFinishedCallback()}{HAL\_TIM\_PWM\_PulseFinishedCallback()}}
+{\footnotesize\ttfamily void HAL\+\_\+\+TIM\+\_\+\+PWM\+\_\+\+Pulse\+Finished\+Callback (\begin{DoxyParamCaption}\item[{TIM\+\_\+\+Handle\+Type\+Def \texorpdfstring{$\ast$}{*}}]{htim }\end{DoxyParamCaption})}
+
+
+
+Timer PWM Pulse Finished Callback. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em htim} & Pointer to the TIM handle \\
+\hline
+\end{DoxyParams}
+\Hypertarget{main_8cpp_acf260f90c402befa02b5318efda8cc4e}\label{main_8cpp_acf260f90c402befa02b5318efda8cc4e} 
+\index{main.cpp@{main.cpp}!LED\_Safety@{LED\_Safety}}
+\index{LED\_Safety@{LED\_Safety}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{LED\_Safety()}{LED\_Safety()}}
+{\footnotesize\ttfamily void LED\+\_\+\+Safety (\begin{DoxyParamCaption}\item[{int}]{mode,  }\item[{int}]{lgtype }\end{DoxyParamCaption})}
+
+
+
+Set the LEDs to safety mode based on mode and light type. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mode} & The mode to set \\
+\hline
+{\em lgtype} & The light type \\
+\hline
+\end{DoxyParams}
+\Hypertarget{main_8cpp_a840291bc02cba5474a4cb46a9b9566fe}\label{main_8cpp_a840291bc02cba5474a4cb46a9b9566fe} 
+\index{main.cpp@{main.cpp}!main@{main}}
+\index{main@{main}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+The application entry point. 
+
+
+\begin{DoxyRetVals}{Return values}
+{\em int} & \\
+\hline
+\end{DoxyRetVals}
+\Hypertarget{main_8cpp_af4afcf37584b66e28753eab349ade16c}\label{main_8cpp_af4afcf37584b66e28753eab349ade16c} 
+\index{main.cpp@{main.cpp}!Set\_Brightness@{Set\_Brightness}}
+\index{Set\_Brightness@{Set\_Brightness}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{Set\_Brightness()}{Set\_Brightness()}}
+{\footnotesize\ttfamily void Set\+\_\+\+Brightness (\begin{DoxyParamCaption}\item[{int}]{brightness }\end{DoxyParamCaption})}
+
+
+
+Set the brightness of the LEDs. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em brightness} & Brightness level (0-\/45) \\
+\hline
+\end{DoxyParams}
+\Hypertarget{main_8cpp_a8d6329b804987f3dde157bcf7c6c6640}\label{main_8cpp_a8d6329b804987f3dde157bcf7c6c6640} 
+\index{main.cpp@{main.cpp}!Set\_LED@{Set\_LED}}
+\index{Set\_LED@{Set\_LED}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{Set\_LED()}{Set\_LED()}}
+{\footnotesize\ttfamily void Set\+\_\+\+LED (\begin{DoxyParamCaption}\item[{int}]{LEDnum,  }\item[{int}]{Red,  }\item[{int}]{Green,  }\item[{int}]{Blue }\end{DoxyParamCaption})}
+
+
+
+Set the color of an LED. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em LEDnum} & The LED number to set \\
+\hline
+{\em Red} & Red color intensity (0-\/255) \\
+\hline
+{\em Green} & Green color intensity (0-\/255) \\
+\hline
+{\em Blue} & Blue color intensity (0-\/255) \\
+\hline
+\end{DoxyParams}
+\Hypertarget{main_8cpp_a32a7378f8ecf47b27e2c54303f3b27b2}\label{main_8cpp_a32a7378f8ecf47b27e2c54303f3b27b2} 
+\index{main.cpp@{main.cpp}!set\_LED\_states@{set\_LED\_states}}
+\index{set\_LED\_states@{set\_LED\_states}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{set\_LED\_states()}{set\_LED\_states()}}
+{\footnotesize\ttfamily void set\+\_\+\+LED\+\_\+states (\begin{DoxyParamCaption}\item[{int}]{mode,  }\item[{int}]{lgtype }\end{DoxyParamCaption})}
+
+
+
+Set the LED states based on mode and light type. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mode} & The mode to set \\
+\hline
+{\em lgtype} & The light type \\
+\hline
+\end{DoxyParams}
+\Hypertarget{main_8cpp_a70af21c671abfcc773614a9a4f63d920}\label{main_8cpp_a70af21c671abfcc773614a9a4f63d920} 
+\index{main.cpp@{main.cpp}!SystemClock\_Config@{SystemClock\_Config}}
+\index{SystemClock\_Config@{SystemClock\_Config}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{SystemClock\_Config()}{SystemClock\_Config()}}
+{\footnotesize\ttfamily void System\+Clock\+\_\+\+Config (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+System Clock Configuration. 
+
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+Configure the main internal regulator output voltage
+
+Initializes the RCC Oscillators according to the specified parameters in the RCC\+\_\+\+Osc\+Init\+Type\+Def structure.
+
+Initializes the CPU, AHB and APB buses clocks

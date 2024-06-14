@@ -1,7 +1,7 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : main.c
+  * @file           : main.cpp
   * @brief          : Main program body
   ******************************************************************************
   * @attention
@@ -22,7 +22,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "string.h"
-#include "MotorDriver.h"
 #include "stm32f4xx_hal.h"
 #include "RCReceiver.h"
 #include <cstdio>
@@ -125,33 +124,38 @@ char msg[100];
 
 
 // ADC Channel selection functions
-static void ADC_Select_CH9 (void)
-{
-	ADC_ChannelConfTypeDef sConfig = {0};
-	  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-	  */
-	  sConfig.Channel = ADC_CHANNEL_9;
-	  sConfig.Rank = 1;
-	  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
-	  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-	  {
-	    Error_Handler();
-	  }
+/**
+ * @brief Select ADC Channel 9
+ */
+static void ADC_Select_CH9(void) {
+    ADC_ChannelConfTypeDef sConfig = {0};
+    /**
+     * Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+     */
+    sConfig.Channel = ADC_CHANNEL_9;
+    sConfig.Rank = 1;
+    sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+    if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK) {
+        Error_Handler();
+    }
 }
 
-static void ADC_Select_CH2 (void)
-{
-	ADC_ChannelConfTypeDef sConfig = {0};
-	  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-	  */
-	  sConfig.Channel = ADC_CHANNEL_2;
-	  sConfig.Rank = 1;
-	  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
-	  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-	  {
-	    Error_Handler();
-	  }
+/**
+ * @brief Select ADC Channel 2
+ */
+static void ADC_Select_CH2(void) {
+    ADC_ChannelConfTypeDef sConfig = {0};
+    /**
+     * Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+     */
+    sConfig.Channel = ADC_CHANNEL_2;
+    sConfig.Rank = 1;
+    sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+    if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK) {
+        Error_Handler();
+    }
 }
+
 
 
 /* USER CODE END PV */
@@ -248,12 +252,6 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-	  // RC Receiver E-Stop
-	  signal1 = receiver1.get_signal();
-	  if ((signal1 > 1600 || signal1 < 1400)){
-		  shoot_state = 4; // go to safety state if RC receiver triggered
-		  LED_Safety(mode_state, type);
-	  }
 
 	  // Get time elapsed every loop
 	  curr_tick = HAL_GetTick();
@@ -279,19 +277,11 @@ int main(void)
 		  // Rev the motors
 		  		__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_1, counts);
 		  		__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_2, counts);
-//		  		trigger_tick = curr_tick;
 	  }
 
-//	  else if(trigger_flag == 1 && (curr_tick-trigger_tick <1000)){
-//		  // Set motors to neutral state
-//		  __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_1, counts);
-//		  __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_2, counts);
-//
-//	  }
 	  else{
 		  __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_1, 1000);
 		  __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_2, 1000);
-//		  trigger_flag = 0;
 	  }
 
 
@@ -395,7 +385,7 @@ int main(void)
 
 	  // Fire Trigger Logic
 	  if (shoot_flag){
-//		  trigger_tick = curr_tick;
+
 		  // Left State
 		  if (mode_state == 0){
 
@@ -406,7 +396,8 @@ int main(void)
 			  }
 			  else if(left_state == 1){
 
-				  if ((dart_counter < idx) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5) && ((curr_tick - left_tick) > Fire_Rate+10)){
+				  if ((dart_counter < idx) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5)
+						  && ((curr_tick - left_tick) > Fire_Rate+10)){
 					  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
 					  left_tick = curr_tick;
 					  dart_counter += 1;
@@ -496,21 +487,19 @@ int main(void)
 			  else if (both_state == 1){
 
 
-					  if (dart_counter < (idx) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5) && (curr_tick-left_tick) > (Fire_Rate+10)){
-						  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_SET);
-						  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
-						  left_tick = curr_tick;
-						  dart_counter += 2;
-					  }
+				  if (dart_counter < (idx) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_7)
+					  && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5) && (curr_tick-left_tick) > (Fire_Rate+10)){
+					  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_SET);
+					  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_SET);
+					  left_tick = curr_tick;
+					  dart_counter += 2;
+				  }
 
-					  else if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8)){
-						  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
-						  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
-					  }
-
+				  else if (!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9) && !HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8)){
+					  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7, GPIO_PIN_RESET);
+					  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13, GPIO_PIN_RESET);
+				  }
 			  }
-
-
 		  }
 
 		  // Right
@@ -534,8 +523,6 @@ int main(void)
 				  }
 			  }
 		  }
-
-
 	  }
 
 	  else{
@@ -1013,234 +1000,205 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
-void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
-
-
-
-	if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3){
-		receiver1.trigger_signal();
-	}
-
-
+/**
+ * @brief Timer Input Capture Callback
+ * @param htim Pointer to the TIM handle
+ */
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
+    if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3) {
+        receiver1.trigger_signal();
+    }
 }
 
-void Set_LED (int LEDnum, int Red, int Green, int Blue)
-{
-	LED_Data[LEDnum][0] = LEDnum;
-	LED_Data[LEDnum][1] = Green;
-	LED_Data[LEDnum][2] = Red;
-	LED_Data[LEDnum][3] = Blue;
+/**
+ * @brief Set the color of an LED
+ * @param LEDnum The LED number to set
+ * @param Red Red color intensity (0-255)
+ * @param Green Green color intensity (0-255)
+ * @param Blue Blue color intensity (0-255)
+ */
+void Set_LED(int LEDnum, int Red, int Green, int Blue) {
+    LED_Data[LEDnum][0] = LEDnum;
+    LED_Data[LEDnum][1] = Green;
+    LED_Data[LEDnum][2] = Red;
+    LED_Data[LEDnum][3] = Blue;
 }
 
-void clear_LEDs(void)
-{
-	for (int i=0; i<MAX_LED; i++)
-	{
-		Set_LED(i,0,0,0);
-	}
+/**
+ * @brief Clear all LEDs
+ */
+void clear_LEDs(void) {
+    for (int i = 0; i < MAX_LED; i++) {
+        Set_LED(i, 0, 0, 0);
+    }
 }
 
-void set_LED_states(int mode, int lgtype)
-{
-
-	// Mode Selection
-	int r1 = 63;
-	int g1 = 63;
-	int b1 = 63;
-	// Background
+/**
+ * @brief Set the LED states based on mode and light type
+ * @param mode The mode to set
+ * @param lgtype The light type
+ */
+void set_LED_states(int mode, int lgtype) {
+    // Mode Selection
+    int r1 = 63;
+    int g1 = 63;
+    int b1 = 63;
+    // Background
 
     // Orange
-	int r2 = 77;
-	int g2 = 30;
-	int b2 = 5;
+    int r2 = 77;
+    int g2 = 30;
+    int b2 = 5;
 
+    // determine which fire type is active (single, burst, auto)
+    int firetype = lgtype % 3;
 
-//	// Blue
-//	int r2 = 0;
-//	int g2 = 0;
-//	int b2 = 15;
+    // LED matrix follows an S pattern starting from right to left
+    // Must do some funky conversion to match the firemode/type grid on the blaster
 
+    clear_LEDs();
 
+    // Row 1
+    if (firetype == 0) {
+        for (int i = 0; i < 4; i++) {
+            Set_LED(3 - i, r2, g2, b2);
+        }
 
-	// determine which fire type is active (single, burst, auto)
-	int firetype = lgtype%3;
+        Set_LED(3 - mode, r1, g1, b1);
 
-	//LED matrix follows an S pattern starting from right to left
-	//Must do some funky conversion to match the firemode/type grid on the blaster
+        Set_LED(4 + mode, r2, g2, b2);
+        Set_LED(11 - mode, r2, g2, b2);
 
-	clear_LEDs();
+    } else if (firetype == 1) {
+        // Row 2
+        for (int i = 0; i < 4; i++) {
+            Set_LED(4 + i, r2, g2, b2);
+        }
 
-	// Row 1
-	if(firetype == 0)
-	{
-		for(int i=0; i<4; i++)
-		{
-			Set_LED(3-i, r2, g2, b2);
-		}
+        Set_LED(4 + mode, r1, g1, b1);
 
-		Set_LED(3-mode, r1, g1, b1);
+        Set_LED(3 - mode, r2, g2, b2);
+        Set_LED(11 - mode, r2, g2, b2);
 
-		Set_LED(4 + mode, r2, g2, b2);
-		Set_LED(11 - mode, r2, g2, b2);
+    } else if (firetype == 2) {
+        // Row 3
+        for (int i = 0; i < 4; i++) {
+            Set_LED(11 - i, r2, g2, b2);
+        }
 
+        Set_LED(11 - mode, r1, g1, b1);
 
+        Set_LED(4 + mode, r2, g2, b2);
+        Set_LED(3 - mode, r2, g2, b2);
+    }
 
-	}
-	else if (firetype == 1)
-	{
-	// Row 2
-		for(int i=0; i<4; i++)
-		{
-			Set_LED(4+i, r2, g2, b2);
-
-		}
-
-		Set_LED(4 + mode, r1, g1, b1);
-
-		Set_LED(3-mode, r2, g2, b2);
-		Set_LED(11 - mode, r2, g2, b2);
-
-
-	}
-	else if (firetype == 2)
-	{
-	// Row 3
-		for(int i=0; i<4; i++)
-		{
-			Set_LED(11-i, r2, g2, b2);
-		}
-
-		Set_LED(11 - mode, r1, g1, b1);
-
-		Set_LED(4 + mode, r2, g2, b2);
-		Set_LED(3-mode, r2, g2, b2);
-
-	}
-
-	WS2812_Send();
+    WS2812_Send();
 }
 
 #define PI 3.14159265
 
-void Set_Brightness (int brightness)  // 0-45
-{
-	#if USE_BRIGHTNESS
+/**
+ * @brief Set the brightness of the LEDs
+ * @param brightness Brightness level (0-45)
+ */
+void Set_Brightness(int brightness) {
+    #if USE_BRIGHTNESS
 
-		if (brightness > 45) brightness = 45;
-		for (int i=0; i<MAX_LED; i++)
-		{
-			LED_Mod[i][0] = LED_Data[i][0];
-			for (int j=1; j<4; j++)
-			{
-				float angle = 90-brightness;  // in degrees
-				angle = angle*PI / 180;  // in rad
-				LED_Mod[i][j] = (LED_Data[i][j])/(tan(angle));
-			}
-		}
+    if (brightness > 45) brightness = 45;
+    for (int i = 0; i < MAX_LED; i++) {
+        LED_Mod[i][0] = LED_Data[i][0];
+        for (int j = 1; j < 4; j++) {
+            float angle = 90 - brightness;  // in degrees
+            angle = angle * PI / 180;  // in rad
+            LED_Mod[i][j] = (LED_Data[i][j]) / (tan(angle));
+        }
+    }
 
-	#endif
+    #endif
 }
 
-void LED_Safety(int mode, int lgtype){
+/**
+ * @brief Set the LEDs to safety mode based on mode and light type
+ * @param mode The mode to set
+ * @param lgtype The light type
+ */
+void LED_Safety(int mode, int lgtype) {
+    int firetype = lgtype % 3;
+    int r2 = 63;
+    int g2 = 0;
+    int b2 = 0;
 
-	int firetype = lgtype%3;
-	int r2 = 63;
-	int g2 = 0;
-	int b2 = 0;
+    if (firetype == 0) {
+        for (int i = 0; i < 4; i++) {
+            Set_LED(3 - i, r2, g2, b2);
+        }
 
-	if(firetype == 0)
-		{
-			for(int i=0; i<4; i++)
-			{
-				Set_LED(3-i, r2, g2, b2);
-			}
+        Set_LED(4 + mode, r2, g2, b2);
+        Set_LED(11 - mode, r2, g2, b2);
 
+    } else if (firetype == 1) {
+        // Row 2
+        for (int i = 0; i < 4; i++) {
+            Set_LED(4 + i, r2, g2, b2);
+        }
 
-			Set_LED(4 + mode, r2, g2, b2);
-			Set_LED(11 - mode, r2, g2, b2);
+        Set_LED(3 - mode, r2, g2, b2);
+        Set_LED(11 - mode, r2, g2, b2);
 
+    } else if (firetype == 2) {
+        // Row 3
+        for (int i = 0; i < 4; i++) {
+            Set_LED(11 - i, r2, g2, b2);
+        }
 
+        Set_LED(4 + mode, r2, g2, b2);
+        Set_LED(3 - mode, r2, g2, b2);
+    }
 
-		}
-		else if (firetype == 1)
-		{
-		// Row 2
-			for(int i=0; i<4; i++)
-			{
-				Set_LED(4+i, r2, g2, b2);
-			}
-
-			Set_LED(3-mode, r2, g2, b2);
-			Set_LED(11 - mode, r2, g2, b2);
-
-
-		}
-		else if (firetype == 2)
-		{
-		// Row 3
-			for(int i=0; i<4; i++)
-			{
-				Set_LED(11-i, r2, g2, b2);
-			}
-
-			Set_LED(4 + mode, r2, g2, b2);
-			Set_LED(3-mode, r2, g2, b2);
-
-		}
-
-		WS2812_Send();
-
-
+    WS2812_Send();
 }
 
+/**
+ * @brief Send the LED data to the WS2812 LEDs
+ */
+void WS2812_Send(void) {
+    uint32_t indx = 0;
+    uint32_t color;
 
+    for (int i = 0; i < MAX_LED; i++) {
+        #if USE_BRIGHTNESS
+        color = ((LED_Mod[i][1] << 16) | (LED_Mod[i][2] << 8) | (LED_Mod[i][3]));
+        #else
+        color = ((LED_Data[i][1] << 16) | (LED_Data[i][2] << 8) | (LED_Data[i][3]));
+        #endif
 
+        for (int i = 23; i >= 0; i--) {
+            if (color & (1 << i)) {
+                pwmData[indx] = 80;  // 2/3 of 120
+            } else {
+                pwmData[indx] = 40;  // 1/3 of 120
+            }
+            indx++;
+        }
+    }
 
-void WS2812_Send (void)
-{
-	uint32_t indx=0;
-	uint32_t color;
+    for (int i = 0; i < 50; i++) {
+        pwmData[indx] = 0;
+        indx++;
+    }
 
-
-	for (int i= 0; i<MAX_LED; i++)
-	{
-		#if USE_BRIGHTNESS
-				color = ((LED_Mod[i][1]<<16) | (LED_Mod[i][2]<<8) | (LED_Mod[i][3]));
-		#else
-				color = ((LED_Data[i][1]<<16) | (LED_Data[i][2]<<8) | (LED_Data[i][3]));
-		#endif
-
-		for (int i=23; i>=0; i--)
-		{
-			if (color&(1<<i))
-			{
-				pwmData[indx] = 80;  // 2/3 of 120
-			}
-
-			else pwmData[indx] = 40;  // 1/3 of 120
-
-			indx++;
-		}
-
-	}
-
-	for (int i=0; i<50; i++)
-	{
-		pwmData[indx] = 0;
-		indx++;
-	}
-
-	HAL_TIM_PWM_Start_DMA(&htim3, TIM_CHANNEL_1, (uint32_t *)pwmData, indx);
-	while (!datasentflag){};
-	datasentflag = 0;
+    HAL_TIM_PWM_Start_DMA(&htim3, TIM_CHANNEL_1, (uint32_t *)pwmData, indx);
+    while (!datasentflag) {};
+    datasentflag = 0;
 }
 
-
-
-void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
-{
-	HAL_TIM_PWM_Stop_DMA(&htim3, TIM_CHANNEL_1);
-	datasentflag=1;
+/**
+ * @brief Timer PWM Pulse Finished Callback
+ * @param htim Pointer to the TIM handle
+ */
+void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim) {
+    HAL_TIM_PWM_Stop_DMA(&htim3, TIM_CHANNEL_1);
+    datasentflag = 1;
 }
 
 /* USER CODE END 4 */
