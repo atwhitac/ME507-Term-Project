@@ -4,7 +4,7 @@ var searchData=
   ['set_5fflag_1',['set_flag',['../class_r_c_receiver.html#adc9a6cf4ac808be86a426e2d8b3c86be',1,'RCReceiver']]],
   ['set_5fled_2',['Set_LED',['../main_8cpp.html#a8d6329b804987f3dde157bcf7c6c6640',1,'main.cpp']]],
   ['set_5fled_5fstates_3',['set_LED_states',['../main_8cpp.html#a32a7378f8ecf47b27e2c54303f3b27b2',1,'main.cpp']]],
-  ['software_20design_4',['Software Design',['../md__software___design.html',1,'']]],
+  ['software_20design_4',['software design',['../md__software___design.html',1,'Software Design'],['../index.html#autotoc_md13',1,'Software Design']]],
   ['stm32f4xx_5fhal_5fmsp_2ec_5',['stm32f4xx_hal_msp.c',['../stm32f4xx__hal__msp_8c.html',1,'']]],
   ['stm32f4xx_5fit_2ec_6',['stm32f4xx_it.c',['../stm32f4xx__it_8c.html',1,'']]],
   ['stm32f4xx_5fsystem_7',['Stm32f4xx_system',['../group__stm32f4xx__system.html',1,'']]],

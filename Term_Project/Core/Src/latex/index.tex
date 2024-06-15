@@ -20,4 +20,80 @@ The blaster has 2 barrels with two magazines loaded into it, allowing for one or
 \end{DoxyImage}
    
 
-The blaster has 12 different firing patterns available, based on both the firing modes and types. The firing modes include the individual left and right magazines, an alternating mode, and a mode where both magazines fire at once. The firing types include single fire, 4-\/round burst, and fully automatic. The blaster can be in any combination of modes using the user interface on the top of the blaster. 
+The blaster has 12 different firing patterns available, based on both the firing modes and types. The firing modes include the individual left and right magazines, an alternating mode, and a mode where both magazines fire at once. The firing types include single fire, 4-\/round burst, and fully automatic. The blaster can be in any combination of modes using the user interface on the top of the blaster.\hypertarget{index_autotoc_md3}{}\doxysection{\texorpdfstring{Mechanical Design}{Mechanical Design}}\label{index_autotoc_md3}
+\hypertarget{index_autotoc_md4}{}\doxysubsection{\texorpdfstring{Overview}{Overview}}\label{index_autotoc_md4}
+This document details the mechanical design of our high rate of fire blaster project. The design process involved many 3D-\/printed parts, CNC machining several key components, soldering components to our board, and assembling the blaster in its entirety.\hypertarget{index_autotoc_md5}{}\doxysubsection{\texorpdfstring{CNC Machined Parts}{CNC Machined Parts}}\label{index_autotoc_md5}
+The blaster features several CNC machined components that are crucial for its high rate of fire and durability. Below are images and descriptions of these parts\+:\hypertarget{index_autotoc_md6}{}\doxysubsubsection{\texorpdfstring{Part 1\+: CNC Base Plate}{Part 1: CNC Base Plate}}\label{index_autotoc_md6}
+ 
+\begin{DoxyImage}
+\includegraphics[width=\textwidth,height=\textheight/2,keepaspectratio=true]{base_plate.jpg}
+\doxyfigcaption{CNC Machined Barrel}
+\end{DoxyImage}
+   
+
+The base plate is meant to act as a rigid mounting for a majority of critical components\hypertarget{index_autotoc_md7}{}\doxysubsubsection{\texorpdfstring{Part 2\+: CNC Machined Trigger Mechanism}{Part 2: CNC Machined Trigger Mechanism}}\label{index_autotoc_md7}
+ 
+\begin{DoxyImage}
+\includegraphics[width=\textwidth,height=\textheight/2,keepaspectratio=true]{flags.jpg}
+\doxyfigcaption{CNC Machined Trigger Mechanism}
+\end{DoxyImage}
+   
+
+The flags are attached to the solenoids, which trigger the beam brake sensors when extended or retracted.\hypertarget{index_autotoc_md8}{}\doxysubsubsection{\texorpdfstring{Part 3\+: CNC Machined Flywheel Housing}{Part 3: CNC Machined Flywheel Housing}}\label{index_autotoc_md8}
+ 
+\begin{DoxyImage}
+\includegraphics[width=\textwidth,height=\textheight/2,keepaspectratio=true]{flywheels.jpg}
+\doxyfigcaption{CNC Machined Flywheel Housing}
+\end{DoxyImage}
+   
+
+The flywheels are designed to house the brushless motors inside them. These were CNC machined due to the high speeds of the motors, which requires a higher quality flywheel.\hypertarget{index_autotoc_md9}{}\doxysubsection{\texorpdfstring{Mid-\/\+Assembly Process}{Mid-Assembly Process}}\label{index_autotoc_md9}
+During the assembly process, we integrated each component slowly verifying it works as intended both mechanically and in software.
+
+ 
+\begin{DoxyImage}
+\includegraphics[width=\textwidth,height=\textheight/2,keepaspectratio=true]{prototype.jpg}
+\doxyfigcaption{Mid-\/\+Assembly}
+\end{DoxyImage}
+   
+
+This photo shows the blaster in its mid-\/assembly stage, where we were testing solenoids, flywheels, and beam brake sensor functionality.\hypertarget{index_autotoc_md10}{}\doxysubsection{\texorpdfstring{Final Product}{Final Product}}\label{index_autotoc_md10}
+The final product is a Nerf blaster that has 12 different modes, a safety switch, potentiometers for flywheel speed and solenoid fire rate adjustment, a user interface, and two triggers for both spinning the motors to speed and firing the darts.
+
+ 
+\begin{DoxyImage}
+\includegraphics[width=\textwidth,height=\textheight/2,keepaspectratio=true]{side_view.jpg}
+\doxyfigcaption{A side view of the final product of the blaster}
+\end{DoxyImage}
+   
+
+ 
+\begin{DoxyImage}
+\includegraphics[width=\textwidth,height=\textheight/2,keepaspectratio=true]{back_view.jpg}
+\doxyfigcaption{Another angle of the blaster}
+\end{DoxyImage}
+   
+
+ 
+\begin{DoxyImage}
+\includegraphics[width=\textwidth,height=\textheight/2,keepaspectratio=true]{top_view.jpg}
+\doxyfigcaption{Top view showing the LED array}
+\end{DoxyImage}
+   
+
+The completed blaster, although not as robust as we would like, functions properly with little software issues. There is one issue with the beam brake sensors lifting due to the high vibrations of the solenoids, but a piece of foam inside the top cover solves this issue for the most part.\hypertarget{index_autotoc_md11}{}\doxysection{\texorpdfstring{Electrical Design}{Electrical Design}}\label{index_autotoc_md11}
+\hypertarget{index_autotoc_md12}{}\doxysubsection{\texorpdfstring{Overview}{Overview}}\label{index_autotoc_md12}
+The electronics of the blaster are built around custom-\/designed PCBs, which control the firing mechanism and other functionalities.
+
+ 
+\begin{DoxyInlineImage}
+\includegraphics[height=\baselineskip,keepaspectratio=true]{pcb.jpg}%Main Board
+\end{DoxyInlineImage}
+    This first board that was designed was not ultimately used for several issues regarding component failure and a combination of both known and unknown issues. We were able to replace this board with a STM32 Black\+Pill development board for a functional product.
+
+ 
+\begin{DoxyInlineImage}
+\includegraphics[height=\baselineskip,keepaspectratio=true]{power_board.jpg}%Power Board
+\end{DoxyInlineImage}
+    This board was used the 24V Solenoid Driver Board. Power is delivered from the batteries towards the top of the board, and the solenoid wires are connected towards the bottom of the image. The board also distributes 24V to the ESCs. The blue, green, and yellow wires are the signals used to control the H-\/bridges. This board worked exceptionally well for the application and allowed us to drive the solenoids at an extremely fast rate of fire. This is done through “\+Solenoid Clamping” which rapidly decays the current generated by the solenoid when returning using the spring. This allows the solenoid to return much quicker than if the current was just freewheeling through a diode.\hypertarget{index_autotoc_md13}{}\doxysubsection{\texorpdfstring{Software Design}{Software Design}}\label{index_autotoc_md13}
+The logic for the blaster is written in C++ using the STM32\+Cube\+IDE. It has several finite state machines (FSMs) that use a combination of timing, a dart counter, user inputs, and the beam breaks to trigger the transitions that fire the darts. This includes handling the safety, firing modes, potentiometers to control fire rate and motor speed, and the LED array for user input. \href{https://mermaid.live/edit\#pako:eNqNVvFr2zoQ_leEYPthZK2dpt0qtsLy2rwN0vYRZzzYPIJmy7GoIwVbYetK__d30smJ7ORlS8CWTt93-nS-k_REM50LyuiLF5PklsSpagw34lryZc1XqUoVgV8ua5EZqRWZztCSlFqbRWKxDNtAxyGljSCVKAzRRYjDUfubl7Ihbh5ScpVXoiGmFCQX3_VGZcLybN_UcrkU9Y4HWDfQ8EKYR9L8kCYrT3BcwJidGXv4vIWlLRJRoXbW7R4Qewjwf1plUYhaKENWfMl_SSXICtjNnppUfX317fXrK3BudL34V6p8s05V2IPR-eO6M3O3D4BOHIMODPVW6UNeVHxJ3tsP2kUTkNPDRFZl1wsAAecC2f4xBl3YUxhtXOf0ZjJnn5Ob2ZCcOjRMYG2IsS0AfZjuYcCEEGgAYnw__9iHWBtibAtAs09_f9xz5IwIc82jmlL1vFubNfkVTSEjFhGDoNUmsMSMTKAUXCc02zmQMcecJTMIEW9Emio3gBO4UO_ct6yYdTAxOW1pRmYPYMk2de3abbif_ZdBilumFz6Ty7KnHE2tdNfrDNhAelZPvROCY70FeMKWGrMuLA6oxxeBjCBH_UISV-MMXwScYQE1UKeF7SW6EkrLvCHXsuHfK5G3mxVSQNp9UXj-InFbBY6D2elupFoy0i75n1o0jcidbpRDJm0JbS2JXx6S21DYtp3u7qi3lnt_52XcAWfCq8rK-L2KaN-TJ6M73_HLPuivLwQCGaa_LaqnNohjbcpuGjlLm0W2E5ptxSIjDvmtOWbu9UcZ3tEEm4HPB-zLwjt59y4rtczE1ZU_HgCJ-ePLiRS6_sHrvLErd4lIxjx7QFOfMmQeEpKclx4H97hWBdq2muzuGsogU97AuQjxyl3O2Anch-jtIUfdDHtunKpTsnUT1HP4DHQEgtlcrgS5cszFzE720joaC74i45o_wOGWCO--M2vc9zo87pX8mdvokNhd74xdQ_ot_oJbgYFkfg9n7c9DQn7H6KRUePKSg8l1tpddIdOVTfjBzuzxvJaqX3Q2BC_bu4o-xNo6ZDcVnBWhyu4FoHPO-h0Tir2Cu5d7hQPjTd0Y5p6h-cPGaGYffpN0PFufDm4PR6xKNzMEbuQDDQy7PpzNw0iAa-vdurGfwk5zAHYeRdt9nw7oStQrLnO4d7qlpRTuVCuRUgbNnNcPKUUcB3fJo8ooM_VGDGitN8uSsoJDvAZ0s853d9UWsuaKsif6k7L44vzkzeXo_OLt5SganZ1fDugjZdHzgP7SGvDxSYS_4cXoIh4OL98MqMglfJNbvBO7q7Hz-MUR7ATP_wFZ5qKT}{\texttt{ }} 
