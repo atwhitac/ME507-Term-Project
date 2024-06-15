@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['rcreceiver_0',['rcreceiver',['../class_r_c_receiver.html',1,'RCReceiver'],['../class_r_c_receiver.html#ab80f33da769f0122538f87b882dff735',1,'RCReceiver::RCReceiver()']]],
-  ['rcreceiver_2ecpp_1',['RCReceiver.cpp',['../_r_c_receiver_8cpp.html',1,'']]]
+  ['get_5fsignal_0',['get_signal',['../class_r_c_receiver.html#a72e354d26dbdcff5110016683f8f8600',1,'RCReceiver']]]
 ];

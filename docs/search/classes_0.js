@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['motordriver_0',['MotorDriver',['../class_motor_driver.html',1,'']]]
+  ['rcreceiver_0',['RCReceiver',['../class_r_c_receiver.html',1,'']]]
 ];

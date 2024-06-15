@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>ME507_Lab_0x03: stm32f4xx_it.c File Reference</title>
+<title>ME 507 Term Project: stm32f4xx_it.c File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -20,11 +20,10 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr id="projectrow">
-  <td id="projectlogo"><img alt="Logo" src="Longhorn-5x-5in.png"/></td>
+  <td id="projectlogo"><img alt="Logo" src="Longhorn1x1in.png"/></td>
   <td id="projectalign">
-   <div id="projectname">ME507_Lab_0x03<span id="projectnumber">&#160;1</span>
+   <div id="projectname">ME 507 Term Project
    </div>
-   <div id="projectbrief">ME 507 Sensor Input Lab</div>
   </td>
  </tr>
  </tbody>
@@ -80,7 +79,7 @@ $(function() {
 
 <p>Interrupt Service Routines.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;<a class="el" href="main_8h_source.html">main.h</a>&quot;</code><br />
+<div class="textblock"><code>#include &quot;main.h&quot;</code><br />
 <code>#include &quot;stm32f4xx_it.h&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
@@ -121,16 +120,27 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>PendSV_Handler</b> (v
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SysTick_Handler</b> (void)</td></tr>
 <tr class="memdesc:ab5e09814056d617c521549e542639b7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function handles System tick timer. <br /></td></tr>
 <tr class="separator:ab5e09814056d617c521549e542639b7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7133f3f78767503641d307386e68bd28" id="r_a7133f3f78767503641d307386e68bd28"><td class="memItemLeft" align="right" valign="top"><a id="a7133f3f78767503641d307386e68bd28" name="a7133f3f78767503641d307386e68bd28"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>TIM4_IRQHandler</b> (void)</td></tr>
-<tr class="memdesc:a7133f3f78767503641d307386e68bd28"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function handles TIM4 global interrupt. <br /></td></tr>
-<tr class="separator:a7133f3f78767503641d307386e68bd28"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30841f7aec070752b7b989ea8a271039" id="r_a30841f7aec070752b7b989ea8a271039"><td class="memItemLeft" align="right" valign="top"><a id="a30841f7aec070752b7b989ea8a271039" name="a30841f7aec070752b7b989ea8a271039"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DMA1_Stream4_IRQHandler</b> (void)</td></tr>
+<tr class="memdesc:a30841f7aec070752b7b989ea8a271039"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function handles DMA1 stream4 global interrupt. <br /></td></tr>
+<tr class="separator:a30841f7aec070752b7b989ea8a271039"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b2096b8b2643286dc3a7e5110e5ae85" id="r_a7b2096b8b2643286dc3a7e5110e5ae85"><td class="memItemLeft" align="right" valign="top"><a id="a7b2096b8b2643286dc3a7e5110e5ae85" name="a7b2096b8b2643286dc3a7e5110e5ae85"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>EXTI9_5_IRQHandler</b> (void)</td></tr>
+<tr class="memdesc:a7b2096b8b2643286dc3a7e5110e5ae85"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function handles EXTI line[9:5] interrupts. <br /></td></tr>
+<tr class="separator:a7b2096b8b2643286dc3a7e5110e5ae85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8a61b27afdb07c70d6b863c44284ca6" id="r_ae8a61b27afdb07c70d6b863c44284ca6"><td class="memItemLeft" align="right" valign="top"><a id="ae8a61b27afdb07c70d6b863c44284ca6" name="ae8a61b27afdb07c70d6b863c44284ca6"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>TIM1_CC_IRQHandler</b> (void)</td></tr>
+<tr class="memdesc:ae8a61b27afdb07c70d6b863c44284ca6"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function handles TIM1 capture compare interrupt. <br /></td></tr>
+<tr class="separator:ae8a61b27afdb07c70d6b863c44284ca6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a85788cec5a97ee377e4ee2e74f026484" id="r_a85788cec5a97ee377e4ee2e74f026484"><td class="memItemLeft" align="right" valign="top"><a id="a85788cec5a97ee377e4ee2e74f026484" name="a85788cec5a97ee377e4ee2e74f026484"></a>
-TIM_HandleTypeDef&#160;</td><td class="memItemRight" valign="bottom"><b>htim4</b></td></tr>
-<tr class="separator:a85788cec5a97ee377e4ee2e74f026484"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c3d9bc8d51e819c8d5062a09eecc03d" id="r_a1c3d9bc8d51e819c8d5062a09eecc03d"><td class="memItemLeft" align="right" valign="top"><a id="a1c3d9bc8d51e819c8d5062a09eecc03d" name="a1c3d9bc8d51e819c8d5062a09eecc03d"></a>
+DMA_HandleTypeDef&#160;</td><td class="memItemRight" valign="bottom"><b>hdma_tim3_ch1_trig</b></td></tr>
+<tr class="separator:a1c3d9bc8d51e819c8d5062a09eecc03d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25fc663547539bc49fecc0011bd76ab5" id="r_a25fc663547539bc49fecc0011bd76ab5"><td class="memItemLeft" align="right" valign="top"><a id="a25fc663547539bc49fecc0011bd76ab5" name="a25fc663547539bc49fecc0011bd76ab5"></a>
+TIM_HandleTypeDef&#160;</td><td class="memItemRight" valign="bottom"><b>htim1</b></td></tr>
+<tr class="separator:a25fc663547539bc49fecc0011bd76ab5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Interrupt Service Routines. </p>
